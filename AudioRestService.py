@@ -87,7 +87,7 @@ def update_zone(zone, data):
     return construct_zone(zone)
 
 
-def update_controller(controller:AudioController,data):
+def update_controller(controller,data):
     parsed_data = json.loads(data)
     controller.select_input(parsed_data['SelectedInput'])
     return {'SelectedInput': controller.selected_input}
