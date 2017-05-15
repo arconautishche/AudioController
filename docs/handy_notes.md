@@ -12,7 +12,18 @@
 
 ### Credentials
 
-Username: pi
-Password: raspberry
+- Username: pi
+- Password: raspberry
 
-OS: Raspbian Jessie Lite
+*OS*: Raspbian Jessie Lite
+
+### Service Software
+
+#### Python Libs (pip install)
+##### Client (ServiceTest)
+
+- requests
+
+##### Server (Service)
+
+- web.py==0.40.dev0
