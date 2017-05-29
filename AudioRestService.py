@@ -20,32 +20,38 @@ class AudioRestService:
 class Zone:
     def GET(self, zone):
         zone = web.audio_controller.zones[int(zone)]
+        web.header('Content-Type', 'application/json')
         return json.dumps(construct_zone(zone))
 
     def PUT(self, zone):
         data = web.data()
         zone = web.audio_controller.zones[int(zone)]
+        web.header('Content-Type', 'application/json')
         return json.dumps(update_zone(zone, data))
 
 
 class Zones:
     def GET(self):
         zones = web.audio_controller.zones
+        web.header('Content-Type', 'application/json')
         return json.dumps(construct_zones(zones))
 
 
 class Inputs:
     def GET(self):
         inputs = web.audio_controller.inputs
+        web.header('Content-Type', 'application/json')
         return json.dumps(construct_inputs(inputs))
 
 
 class Controller:
     def GET(self):
+        web.header('Content-Type', 'application/json')
         return json.dumps(construct_controller(web.audio_controller))
 
     def PUT(self):
         data=web.data()
+        web.header('Content-Type', 'application/json')
         return json.dumps(update_controller(web.audio_controller,data))
 
 def construct_zone(zone):
