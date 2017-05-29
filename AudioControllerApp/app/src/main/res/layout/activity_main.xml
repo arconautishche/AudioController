@@ -6,13 +6,13 @@
     android:layout_height="match_parent"
     tools:context="com.example.anton.audiocontrollerapp.MainActivity">
 
-    <ToggleButton
+    <!--<ToggleButton
         android:id="@+id/toggleButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="ToggleButton"
         tools:layout_editor_absoluteX="82dp"
-        tools:layout_editor_absoluteY="314dp" />
+        tools:layout_editor_absoluteY="314dp" />-->
 
     <Button
         android:id="@+id/button"
@@ -21,5 +21,5 @@
         android:onClick="onButtonClick"
         android:text="Button"
         tools:layout_editor_absoluteX="22dp"
-        tools:layout_editor_absoluteY="-81dp" />
+        tools:layout_editor_absoluteY="81dp" />
 </android.support.constraint.ConstraintLayout>
