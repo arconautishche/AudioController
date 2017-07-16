@@ -3,8 +3,11 @@ package com.example.anton.audiocontrollerapp;
         import android.os.Bundle;
         import android.support.annotation.NonNull;
         import android.support.v7.app.AppCompatActivity;
+        import android.support.v7.widget.LinearLayoutCompat;
         import android.view.View;
+        import android.widget.LinearLayout;
         import android.widget.Toast;
+        import android.widget.ToggleButton;
 
         import java.io.IOException;
         import java.io.InputStream;
@@ -26,10 +29,14 @@ package com.example.anton.audiocontrollerapp;
 
 public class MainActivity extends AppCompatActivity {
 
+    private LinearLayout mZonesContainer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mZonesContainer = (LinearLayout)findViewById(R.id.zonesContainer);
     }
 
 
@@ -64,11 +71,32 @@ public class MainActivity extends AppCompatActivity {
             int howMany = zones.length();
             Toast.makeText(getApplicationContext(), "Zones: "+ howMany, Toast.LENGTH_LONG).show();
 
+            mZonesContainer.removeAllViews();
+
+            for (int i = 0; i < zones.length(); i++) {
+                JSONObject zone = zones.getJSONObject(i);
+                String zoneName = zone.getString("Name");
+                Boolean enabled = zone.getBoolean("Enabled");
+
+                mZonesContainer.addView(createViewForZone(zoneName, enabled));
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
         return ;
+    }
+
+    private View createViewForZone(String zoneName, Boolean enabled) {
+
+        ToggleButton zoneToggle = new ToggleButton(getApplicationContext());
+        zoneToggle.setChecked(enabled);
+        zoneToggle.setText(zoneName);
+        zoneToggle.setTextOn(zoneName);
+        zoneToggle.setTextOff(zoneName);
+
+        return zoneToggle;
     }
 
 
