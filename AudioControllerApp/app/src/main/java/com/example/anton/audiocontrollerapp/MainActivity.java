@@ -1,6 +1,7 @@
 package com.example.anton.audiocontrollerapp;
 
         import android.os.Bundle;
+        import android.support.annotation.NonNull;
         import android.support.v7.app.AppCompatActivity;
         import android.view.View;
         import android.widget.Toast;
@@ -19,6 +20,8 @@ package com.example.anton.audiocontrollerapp;
         import com.android.volley.toolbox.StringRequest;
         import com.android.volley.toolbox.Volley;
 
+        import org.json.JSONArray;
+        import org.json.JSONException;
         import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
@@ -32,18 +35,15 @@ public class MainActivity extends AppCompatActivity {
 
     public void onButtonClick(View view) {
 
-        // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(this);
-        String url ="http://www.google.com";
+        String url ="http://192.168.0.105:8080/AudioController/api/v1/controller/zones";
 
-// Request a string response from the provided URL.
+        // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        // Display the first 500 characters of the response string.
-                        Toast.makeText(getApplicationContext(), "Response is: "+ response.substring(0,50), Toast.LENGTH_LONG).show();
-                        //JSONObject
+                        ProcessZones(response);
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -51,7 +51,25 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Response is: "+ error.toString(), Toast.LENGTH_LONG).show();
             }
         });
-// Add the request to the RequestQueue.
+
+        // Add the request to the RequestQueue.
         queue.add(stringRequest);
     }
+
+    @NonNull
+    private void ProcessZones(String response) {
+
+        try {
+            JSONArray zones = new JSONArray(response);
+            int howMany = zones.length();
+            Toast.makeText(getApplicationContext(), "Zones: "+ howMany, Toast.LENGTH_LONG).show();
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return ;
+    }
+
+
 }
