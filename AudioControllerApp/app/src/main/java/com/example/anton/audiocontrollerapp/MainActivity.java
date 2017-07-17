@@ -4,6 +4,7 @@ package com.example.anton.audiocontrollerapp;
         import android.support.annotation.NonNull;
         import android.support.v7.app.AppCompatActivity;
         import android.support.v7.widget.LinearLayoutCompat;
+        import android.view.LayoutInflater;
         import android.view.View;
         import android.widget.LinearLayout;
         import android.widget.Toast;
@@ -78,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
                 String zoneName = zone.getString("Name");
                 Boolean enabled = zone.getBoolean("Enabled");
 
-                mZonesContainer.addView(createViewForZone(zoneName, enabled));
+                createViewForZone(zoneName, enabled);
             }
 
         } catch (JSONException e) {
@@ -88,15 +89,17 @@ public class MainActivity extends AppCompatActivity {
         return ;
     }
 
-    private View createViewForZone(String zoneName, Boolean enabled) {
+    private void createViewForZone(String zoneName, Boolean enabled) {
 
-        ToggleButton zoneToggle = new ToggleButton(getApplicationContext());
+        View zoneView = this.getLayoutInflater().inflate(R.layout.zone_layout, mZonesContainer, false);
+
+        ToggleButton zoneToggle = (ToggleButton)zoneView.findViewById(R.id.zoneEnabledToggle);
         zoneToggle.setChecked(enabled);
         zoneToggle.setText(zoneName);
         zoneToggle.setTextOn(zoneName);
         zoneToggle.setTextOff(zoneName);
 
-        return zoneToggle;
+        mZonesContainer.addView(zoneView);
     }
 
 
