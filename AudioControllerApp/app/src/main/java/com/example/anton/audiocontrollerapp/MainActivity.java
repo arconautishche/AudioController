@@ -1,103 +1,90 @@
 package com.example.anton.audiocontrollerapp;
 
-        import android.os.Bundle;
-        import android.support.annotation.NonNull;
-        import android.support.v7.app.AppCompatActivity;
-        import android.support.v7.widget.LinearLayoutCompat;
-        import android.view.LayoutInflater;
-        import android.view.View;
-        import android.widget.LinearLayout;
-        import android.widget.Toast;
-        import android.widget.ToggleButton;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.CompoundButton;
+import android.widget.LinearLayout;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
-        import java.io.IOException;
-        import java.io.InputStream;
-        import java.io.InputStreamReader;
-        import java.net.HttpURLConnection;
-        import java.net.MalformedURLException;
-        import java.net.URL;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 
-        import com.android.volley.Request;
-        import com.android.volley.RequestQueue;
-        import com.android.volley.Response;
-        import com.android.volley.VolleyError;
-        import com.android.volley.toolbox.StringRequest;
-        import com.android.volley.toolbox.Volley;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-        import org.json.JSONArray;
-        import org.json.JSONException;
-        import org.json.JSONObject;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
     private LinearLayout mZonesContainer;
+    private ControllerModel mController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mZonesContainer = (LinearLayout)findViewById(R.id.zonesContainer);
+        mZonesContainer = (LinearLayout) findViewById(R.id.zonesContainer);
+        mController = new ControllerModel(this, "http://192.168.1.43:8080");
     }
 
 
     public void onButtonClick(View view) {
-
-        RequestQueue queue = Volley.newRequestQueue(this);
-        String url ="http://192.168.0.105:8080/AudioController/api/v1/controller/zones";
-
-        // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
+        mController.requestZones(
+                new Response.Listener<ArrayList<AudioZone>>() {
                     @Override
-                    public void onResponse(String response) {
-                        ProcessZones(response);
+                    public void onResponse(ArrayList<AudioZone> zones) {
+                        ProcessZones(zones);
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(), "Response is: "+ error.toString(), Toast.LENGTH_LONG).show();
-            }
-        });
-
-        // Add the request to the RequestQueue.
-        queue.add(stringRequest);
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getApplicationContext(), "Error: " + error.toString(), Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 
-    @NonNull
-    private void ProcessZones(String response) {
+    private void ProcessZones(ArrayList<AudioZone> zones) {
 
-        try {
-            JSONArray zones = new JSONArray(response);
-            int howMany = zones.length();
-            Toast.makeText(getApplicationContext(), "Zones: "+ howMany, Toast.LENGTH_LONG).show();
+        int howMany = zones.size();
+        Toast.makeText(getApplicationContext(), "Zones: " + howMany, Toast.LENGTH_LONG).show();
 
-            mZonesContainer.removeAllViews();
+        mZonesContainer.removeAllViews();
 
-            for (int i = 0; i < zones.length(); i++) {
-                JSONObject zone = zones.getJSONObject(i);
-                String zoneName = zone.getString("Name");
-                Boolean enabled = zone.getBoolean("Enabled");
-
-                createViewForZone(zoneName, enabled);
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
+        for (int i = 0; i < zones.size(); i++) {
+            AudioZone zone = zones.get(i);
+            createViewForZone(zone);
         }
 
-        return ;
+        return;
     }
 
-    private void createViewForZone(String zoneName, Boolean enabled) {
+    private void createViewForZone(final AudioZone zone) {
 
         View zoneView = this.getLayoutInflater().inflate(R.layout.zone_layout, mZonesContainer, false);
 
-        ToggleButton zoneToggle = (ToggleButton)zoneView.findViewById(R.id.zoneEnabledToggle);
-        zoneToggle.setChecked(enabled);
-        zoneToggle.setText(zoneName);
-        zoneToggle.setTextOn(zoneName);
-        zoneToggle.setTextOff(zoneName);
+        ToggleButton zoneToggle = (ToggleButton) zoneView.findViewById(R.id.zoneEnabledToggle);
+        zoneToggle.setTextOn(zone.getName() + " - ON");
+        zoneToggle.setTextOff(zone.getName() + " - OFF");
+        zoneToggle.setChecked(zone.getEnabled());
+
+        zoneToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                zone.setEnabled(isChecked);
+                mController.setZoneEnabled(zone);
+            }
+        });
 
         mZonesContainer.addView(zoneView);
     }

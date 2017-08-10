@@ -8,6 +8,7 @@ public class AudioZone {
 
     private String mName;
     private Boolean mEnabled;
+    private Integer mID;
 
     public String getName() {
         return mName;
@@ -23,5 +24,13 @@ public class AudioZone {
 
     public void setEnabled(Boolean enabled) {
         mEnabled = enabled;
+    }
+
+    public Integer getID() {
+        return mID;
+    }
+
+    public void setID(Integer mID) {
+        this.mID = mID;
     }
 }
