@@ -27,3 +27,7 @@
 ##### Server (Service)
 
 - web.py==0.40.dev0
+
+### Start service
+cd /home/AudioController/
+python AudioServiceRPi.py
