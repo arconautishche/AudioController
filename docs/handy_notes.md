@@ -31,5 +31,12 @@ Use *PuTTY*, ssh to 192.168.1.43
 - web.py==0.40.dev0
 
 ### Start service
-cd /home/AudioController/
+cd /opt/audio/AudioController/
 python AudioServiceRPi.py
+
+#### Configure autostart
+from: http://www.instructables.com/id/Raspberry-Pi-Launch-Python-script-on-startup/
+
+### Install Spotify server (mopidy)
+from: https://docs.mopidy.com/en/latest/installation/debian/#debian-install
+wget -q -O - https://apt.mopidy.com/mopidy.gpg | sudo apt-key add -
