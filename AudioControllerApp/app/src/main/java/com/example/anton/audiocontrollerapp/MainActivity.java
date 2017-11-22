@@ -4,8 +4,11 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -23,10 +26,11 @@ import org.json.JSONObject;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private LinearLayout mZonesContainer;
     private ControllerModel mController;
+    private Spinner mActiveInputSelector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,11 +38,20 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mZonesContainer = (LinearLayout) findViewById(R.id.zonesContainer);
+        mActiveInputSelector = (Spinner)findViewById(R.id.activeInputSelector);
+        mActiveInputSelector.setOnItemSelectedListener(this);
+
         mController = new ControllerModel(this, "http://192.168.1.43:8080");
+
+        Refresh();
     }
 
 
-    public void onButtonClick(View view) {
+    public void onRefreshClick(View view) {
+        Refresh();
+    }
+
+    private void Refresh() {
         mController.requestZones(
                 new Response.Listener<ArrayList<AudioZone>>() {
                     @Override
@@ -49,9 +62,31 @@ public class MainActivity extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), "Error: " + error.toString(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(
+                                getApplicationContext(),
+                                "Error with zones: " + error.toString(),
+                                Toast.LENGTH_LONG).show();
                     }
                 });
+
+        mController.requestInputs(
+                new Response.Listener<ArrayList<AudioInput>>() {
+                    @Override
+                    public void onResponse(ArrayList<AudioInput> zones) {
+                        ProcessInputs(zones);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(
+                                getApplicationContext(),
+                                "Error with inputs: " + error.toString(),
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+
+
     }
 
     private void ProcessZones(ArrayList<AudioZone> zones) {
@@ -67,6 +102,42 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return;
+    }
+
+    private void ProcessInputs(ArrayList<AudioInput> inputs) {
+
+        int howMany = inputs.size();
+        Toast.makeText(getApplicationContext(), "Inputs: " + howMany, Toast.LENGTH_LONG).show();
+
+        ArrayList<AudioInput> inputsArray = new ArrayList<>();
+        int active = 0;
+
+        for (int i = 0; i < inputs.size(); i++) {
+            AudioInput input = inputs.get(i);
+            inputsArray.add(input);
+            if (input.getEnabled())
+                active = i;
+        }
+
+        ArrayAdapter<AudioInput> inputsAdapter = new ArrayAdapter<AudioInput>(
+                this,
+                android.R.layout.simple_spinner_dropdown_item,
+                inputsArray);
+
+        mActiveInputSelector.setAdapter(inputsAdapter);
+        mActiveInputSelector.setSelection(active);
+
+        return;
+    }
+
+    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+        AudioInput selectedInput = (AudioInput) parent.getItemAtPosition(pos);
+
+        Toast.makeText(parent.getContext(),
+                "setting input: " + selectedInput,
+                Toast.LENGTH_SHORT).show();
+
+        mController.setActiveInput(selectedInput);
     }
 
     private void createViewForZone(final AudioZone zone) {
@@ -90,4 +161,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
 }
