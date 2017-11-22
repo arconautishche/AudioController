@@ -1,3 +1,1 @@
-# AudioController
-
-see [docs]
+# see /docs
