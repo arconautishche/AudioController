@@ -39,4 +39,5 @@ from: http://www.instructables.com/id/Raspberry-Pi-Launch-Python-script-on-start
 
 ### Install Spotify server (mopidy)
 from: https://docs.mopidy.com/en/latest/installation/debian/#debian-install
+
 wget -q -O - https://apt.mopidy.com/mopidy.gpg | sudo apt-key add -
