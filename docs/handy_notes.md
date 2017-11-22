@@ -10,7 +10,9 @@
 - RPI-GPIO-20 - _black_ - RelayModule-GND
 - RPI-GPIO-22 - _blue_ - RelayModule-in3
 
-### Credentials
+### Connect to the RaspberyPi
+
+Use *PuTTY*, ssh to 192.168.1.43
 
 - Username: pi
 - Password: raspberry
