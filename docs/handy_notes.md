@@ -41,3 +41,7 @@ from: http://www.instructables.com/id/Raspberry-Pi-Launch-Python-script-on-start
 from: https://docs.mopidy.com/en/latest/installation/debian/#debian-install
 
 wget -q -O - https://apt.mopidy.com/mopidy.gpg | sudo apt-key add -
+
+-> mopidy not needed...
+### install despotify
+http://mitchfournier.com/2013/03/26/install-command-line-spotify-on-a-headless-raspberry-pi/
