@@ -42,6 +42,11 @@ from: https://docs.mopidy.com/en/latest/installation/debian/#debian-install
 
 wget -q -O - https://apt.mopidy.com/mopidy.gpg | sudo apt-key add -
 
--> mopidy not needed...
+-> when it starts, I don't see it appear as an external device in other spotify clients
 ### install despotify
 http://mitchfournier.com/2013/03/26/install-command-line-spotify-on-a-headless-raspberry-pi/
+-> error on compilation
+
+### install raspotify
+https://github.com/dtcooper/raspotify
+-> hoping this one does work
