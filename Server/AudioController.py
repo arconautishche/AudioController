@@ -1,3 +1,6 @@
+from subprocess import Popen
+
+
 class AudioController:
     INPUT_SELECTOR_BCM = [11, 13]  # little endian: first pin is least significant bit
 
@@ -8,6 +11,7 @@ class AudioController:
         self.__create_inputs()
         self.__setup_input_BCMs()
         self.selected_input = 1
+        self.__stream_play_processes = []
 
     def __create_zones(self):
         self.zones = {}
@@ -42,13 +46,27 @@ class AudioController:
     def select_input(self, input_id):
         if input_id not in self.inputs.keys():
             raise ValueError('Input id unknown')
-        address = self.inputs[input_id]['address']
 
+        for p in self.__stream_play_processes:
+            p.kill()
+            self.__stream_play_processes.remove(p)
+
+        inp = self.inputs[input_id]
+
+        if inp['type'] == 'stream':
+            self.__play_stream(inp['url'])
+
+        self.selected_input = input_id
+
+    def select_aux_channel(self, address):
         for i in [0, len(self.INPUT_SELECTOR_BCM) - 1]:
             pinTrue = bool(address >> i & 1)
             pinBcm = self.INPUT_SELECTOR_BCM[i]
             self.__gpio.output(pinBcm, self.__gpio.LOW if pinTrue else self.__gpio.HIGH)
-        self.selected_input = input_id
+
+    def __play_stream(self, url):
+        p = Popen(["mpg123", url])
+        self.__stream_play_processes.append(p)
 
 
 class Zone:

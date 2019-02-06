@@ -8,7 +8,8 @@ json_enable = '{"Enabled": true}'
 json_disable = '{"Enabled": false}'
 
 print(requests.get(server_address + '/inputs', json_enable).json())
-# print(requests.put(server_address,'{"SelectedInput": 2}').json())
+print(requests.put(server_address, '{"SelectedInput": 3}').json())
+
 # print(requests.get(server_address).json())
 # print(requests.get(server_address + '/zones').json())
 # time.sleep(1)
