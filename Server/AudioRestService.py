@@ -50,9 +50,10 @@ class Controller:
         return json.dumps(construct_controller(web.audio_controller))
 
     def PUT(self):
-        data=web.data()
+        data = web.data()
         web.header('Content-Type', 'application/json')
-        return json.dumps(update_controller(web.audio_controller,data))
+        return json.dumps(update_controller(web.audio_controller, data))
+
 
 def construct_zone(zone):
     return ({'ZoneId': zone.id, \
@@ -76,14 +77,12 @@ def construct_controller(audio_controller):
 
 def construct_inputs(inputs):
     inputs_constructed = []
-    for inp_id, inp in inputs.items(): inputs_constructed.append(construct_input(inp))
+    for inp_id, inp in inputs.items(): inputs_constructed.append(construct_input(inp_id, inp))
     return inputs_constructed
 
 
-def construct_input(inp):
-    print(inp['id'])
-    print(inp['name'])
-    return ({'InputId': inp['id'], \
+def construct_input(inp_id, inp):
+    return ({'InputId': inp_id, \
              'Name': inp['name']})
 
 
@@ -93,7 +92,7 @@ def update_zone(zone, data):
     return construct_zone(zone)
 
 
-def update_controller(controller,data):
+def update_controller(controller, data):
     parsed_data = json.loads(data)
     controller.select_input(parsed_data['SelectedInput'])
     return {'SelectedInput': controller.selected_input}
