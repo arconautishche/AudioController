@@ -19,17 +19,25 @@ class AudioController:
         self.zones[id] = Zone(self.__gpio, id, bcm, name)
 
     def __create_inputs(self):
-        self.inputs = {}
-        self.__create_input(1, 0, 'Bluetooth')
-        self.__create_input(2, 1, 'Radio')
-        self.__create_input(3, 2, 'Raspberry Pi')
+        self.inputs = {
+            1: {'name': 'Spotify',
+                'type': 'software'},
+            2: {'name': 'StuBru',
+                'type': 'stream',
+                'url': 'http://icecast.vrtcdn.be/stubru-high.mp3'},
+            3: {'name': 'Radio 1',
+                'type': 'stream',
+                'url': 'http://icecast.vrtcdn.be/radio1-high.mp3'},
+            4: {'name': 'Klara',
+                'type': 'stream',
+                'url': 'http://icecast.vrtcdn.be/klara-high.mp3'},
+            5: {'name': 'Bluetooth',
+                'type': 'aux'}
+        }
 
     def __setup_input_BCMs(self):
         for bcm in self.INPUT_SELECTOR_BCM:
             self.__gpio.setup(bcm, self.__gpio.OUT, initial=self.__gpio.HIGH)
-
-    def __create_input(self, id, address, name):
-        self.inputs[id] = {'id': id, 'address': address, 'name': name}
 
     def select_input(self, input_id):
         if input_id not in self.inputs.keys():
