@@ -38,8 +38,9 @@ from: http://www.instructables.com/id/Raspberry-Pi-Launch-Python-script-on-start
 https://github.com/dtcooper/raspotify
 
 ### mpg123 
-installation: 'sudo apt-get install mpg123'
-play stream: 'mpg123 "http://icecast.vrtcdn.be/radio1-high.mp3"'
+installation: `sudo apt-get install mpg123`
+
+play stream: `mpg123 "http://icecast.vrtcdn.be/radio1-high.mp3"`
 
 
 
