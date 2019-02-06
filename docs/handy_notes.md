@@ -37,6 +37,10 @@ from: http://www.instructables.com/id/Raspberry-Pi-Launch-Python-script-on-start
 ### raspotify
 https://github.com/dtcooper/raspotify
 
+### despotify
+I think I installed this one eventually.
+Logged in as a client; visible in Spotify when logged in with same credentials.
+
 ## Additional configuration
 ### Issue with noice on jack out
 
