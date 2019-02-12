@@ -83,7 +83,7 @@ def construct_inputs(inputs):
 
 def construct_input(inp_id, inp):
     return ({'InputId': inp_id, \
-             'Name': inp['name']})
+             'Name': inp.name})
 
 
 def update_zone(zone, data):

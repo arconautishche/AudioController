@@ -7,35 +7,30 @@ server_address = 'http://localhost:8080/AudioController/api/v1/controller'
 json_enable = '{"Enabled": true}'
 json_disable = '{"Enabled": false}'
 
-print(requests.get(server_address + '/inputs', json_enable).json())
-print(requests.put(server_address, '{"SelectedInput": 3}').json())
+def get_zones():
+    print(requests.get(server_address).json())
 
-# print(requests.get(server_address).json())
-# print(requests.get(server_address + '/zones').json())
-# time.sleep(1)
-# print(requests.put(server_address + '/zones/1',json_enable).json())
-# time.sleep(1)
-# print(requests.put(server_address + '/zones/2',json_enable).json())
-# time.sleep(1)
-# print(requests.put(server_address + '/zones/3',json_enable).json())
-# time.sleep(1)
-# print(requests.put(server_address + '/zones/1',json_disable).json())
-# time.sleep(1)
-# print(requests.put(server_address + '/zones/2',json_disable).json())
-# time.sleep(1)
-# print(requests.put(server_address + '/zones/3',json_disable).json())
-# time.sleep(1)
-# print(requests.put(server_address,'{"SelectedInput": 2}').json())
-# time.sleep(1)
-# print(requests.put(server_address,'{"SelectedInput": 3}').json())
-# time.sleep(1)
-# print(requests.put(server_address,'{"SelectedInput": 1}').json())
+def select_zone(zone_id, enabled=True, wait=1):
+    json = json_enable if enabled else json_disable
+    print(requests.put('{}/zones/{}'.format(server_address, zone_id), json).json())
+    time.sleep(wait)
 
-#
-# jsonstring = '{"Enabled": true}'
-# time.sleep(2)
-# response = requests.put('http://localhost:8080/zones/1', jsonstring)
-# data = response.json()
-#
-# response = requests.put('http://localhost:8080/zones/3', jsonstring)
-# data = response.json()
+def select_input(input_id, wait=1):
+    print(requests.put(server_address, '{{"SelectedInput": {}}}'.format(input_id)).json())
+    time.sleep(wait)
+
+get_zones()
+# select_zone(1, True)
+# select_zone(2, True)
+# select_zone(3, True)
+# select_zone(1, False)
+# select_zone(2, False)
+# select_zone(3, False)
+
+select_input(0)
+select_input(1)
+select_input(2)
+select_input(3)
+select_input(4)
+select_input(5)
+
