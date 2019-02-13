@@ -1,9 +1,6 @@
-from AudioController import AudioController
-from AudioRestService import AudioRestService
 import RPi.GPIO as GPIO
 
-print('initializing...')
-control = AudioController(GPIO)
-service = AudioRestService()
+import AudioRestService
+
 print('starting service...')
-service.start_service(control)
+AudioRestService.start_service(GPIO)

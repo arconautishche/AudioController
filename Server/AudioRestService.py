@@ -1,20 +1,20 @@
-import web
 import json
 from AudioController import AudioController
+import web
+
+urls = (
+    '/AudioController/api/v1/controller', 'Controller',
+    '/AudioController/api/v1/controller/inputs', 'Inputs',
+    '/AudioController/api/v1/controller/zones', 'Zones',
+    '/AudioController/api/v1/controller/zones/(.*)', 'Zone'
+)
 
 
-class AudioRestService:
-    urls = (
-        '/AudioController/api/v1/controller', 'Controller',
-        '/AudioController/api/v1/controller/inputs', 'Inputs',
-        '/AudioController/api/v1/controller/zones', 'Zones',
-        '/AudioController/api/v1/controller/zones/(.*)', 'Zone'
-    )
-
-    def start_service(self, ac):
-        app = web.application(self.urls, globals())
-        web.audio_controller = ac
-        app.run()
+def start_service(gpio):
+    ac = AudioController(gpio)
+    app = web.application(urls, globals())
+    web.audio_controller = ac
+    app.run()
 
 
 class Zone:
@@ -47,7 +47,8 @@ class Inputs:
 class Controller:
     def GET(self):
         web.header('Content-Type', 'application/json')
-        return json.dumps(construct_controller(web.audio_controller))
+        return_object = construct_controller(web.audio_controller)
+        return json.dumps(return_object)
 
     def PUT(self):
         data = web.data()
@@ -56,9 +57,10 @@ class Controller:
 
 
 def construct_zone(zone):
-    return ({'ZoneId': zone.id, \
-             'Name': zone.name, \
-             'Enabled': zone.on})
+    return ({'ZoneId': zone.id,
+             'Name': zone.name,
+             'Enabled': zone.enabled,
+             'Volume': zone.volume})
 
 
 def construct_zones(zones):
@@ -68,11 +70,9 @@ def construct_zones(zones):
 
 
 def construct_controller(audio_controller):
-    return ({'Inputs': construct_inputs(audio_controller.inputs), \
-             'Zones': construct_zones(audio_controller.zones), \
+    return ({'Inputs': construct_inputs(audio_controller.inputs),
+             'Zones': construct_zones(audio_controller.zones),
              'SelectedInput': audio_controller.selected_input})
-    for zoneid, zone in zones.items(): zones_constructed.append(construct_zone(zone))
-    return zones_constructed
 
 
 def construct_inputs(inputs):
@@ -82,13 +82,16 @@ def construct_inputs(inputs):
 
 
 def construct_input(inp_id, inp):
-    return ({'InputId': inp_id, \
+    return ({'InputId': inp_id,
              'Name': inp.name})
 
 
 def update_zone(zone, data):
     parsed_data = json.loads(data)
-    zone.set_enabled(parsed_data['Enabled'])
+    if 'Enabled' in parsed_data:
+        zone.enabled = parsed_data['Enabled']
+    if 'Volume' in parsed_data:
+        zone.volume = parsed_data['Volume']
     return construct_zone(zone)
 
 
