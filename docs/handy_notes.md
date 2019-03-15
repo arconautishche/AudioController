@@ -7,6 +7,9 @@
 - RPI-GPIO-20 - _black_ - RelayModule-GND
 - RPI-GPIO-22 - _blue_ - RelayModule-in3
 
+
+![image](https://hackster.imgix.net/uploads/attachments/218603/6sQiFTKXhZptFiGnPlsc.png "schema")
+
 # RaspberryPi
 ## Connecting
 
