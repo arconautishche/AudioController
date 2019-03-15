@@ -10,6 +10,7 @@
 ## Components
 - Stereo audio volume control: [PGA2311](http://www.ti.com/lit/ds/symlink/pga2311.pdf)
 
+## RaspberryPi layout
 ![image](https://hackster.imgix.net/uploads/attachments/218603/6sQiFTKXhZptFiGnPlsc.png "schema")
 
 # RaspberryPi
