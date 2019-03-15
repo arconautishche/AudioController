@@ -7,6 +7,8 @@
 - RPI-GPIO-20 - _black_ - RelayModule-GND
 - RPI-GPIO-22 - _blue_ - RelayModule-in3
 
+## Components
+- Stereo audio volume control: [PGA2311](http://www.ti.com/lit/ds/symlink/pga2311.pdf)
 
 ![image](https://hackster.imgix.net/uploads/attachments/218603/6sQiFTKXhZptFiGnPlsc.png "schema")
 
