@@ -1,4 +1,5 @@
 from subprocess import Popen
+import spidev
 
 BCM_EETKAMER = 23
 BCM_BADKAMER = 24
@@ -7,6 +8,11 @@ BCM_INPUT_SELECTOR = [11, 13]  # little endian: first pin is least significant b
 INPUT_ADDRESS_NONE = 0
 INPUT_ADDRESS_RPI = 1
 INPUT_ADDRESS_BLUETOOTH = 2
+
+
+class VolumeControl:
+    def __init__(self):
+        self.spi = spidev.SpiDev()
 
 
 class Zone:
@@ -70,6 +76,7 @@ class StreamInput(Input):
 
 class AudioController:
     def __init__(self, gpio):
+        self.zones = {}
         self.__gpio = gpio
         gpio.setmode(gpio.BCM)
         self.__create_zones()
@@ -78,16 +85,15 @@ class AudioController:
         self.selected_input = 0
 
     def __create_zones(self):
-        self.zones = {}
-        self.__create_zone(1, BCM_EETKAMER, 'Eetkamer')
-        self.__create_zone(2, BCM_BADKAMER, 'Badkamer')
-        self.__create_zone(3, BCM_TERRAS, 'Terras')
+        def create_zone(id, bcm, name):
+            self.zones[id] = Zone(self.__gpio, id, bcm, name)
 
-    def __create_zone(self, id, bcm, name):
-        self.zones[id] = Zone(self.__gpio, id, bcm, name)
+        create_zone(1, BCM_EETKAMER, 'Eetkamer')
+        create_zone(2, BCM_BADKAMER, 'Badkamer')
+        create_zone(3, BCM_TERRAS, 'Terras')
 
     def __create_inputs(self):
-        self.inputs = {k: v for k, v in enumerate([
+        self.inputs = {key: inpt for key, inpt in enumerate([
             Input("None", self.__gpio, INPUT_ADDRESS_NONE),
             SpotifyInput("Spotify", self.__gpio),
             StreamInput("StuBru", self.__gpio, 'http://icecast.vrtcdn.be/stubru-high.mp3'),
