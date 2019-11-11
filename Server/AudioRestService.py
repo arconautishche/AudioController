@@ -1,5 +1,5 @@
 import json
-from AudioController import AudioController
+from AudioController import AudioController, MAX_VOLUME
 import web
 
 urls = (
@@ -25,9 +25,10 @@ class Zone:
 
     def PUT(self, zone):
         data = web.data()
-        zone = web.audio_controller.zones[int(zone)]
+        zone_id = int(zone)
         web.header('Content-Type', 'application/json')
-        return json.dumps(update_zone(zone, data))
+        return_object = update_zone(zone_id, data)
+        return json.dumps(return_object)
 
 
 class Zones:
@@ -60,7 +61,8 @@ def construct_zone(zone):
     return ({'ZoneId': zone.id,
              'Name': zone.name,
              'Enabled': zone.enabled,
-             'Volume': zone.volume})
+             'Volume': zone.volume,
+             'MaxVolume': MAX_VOLUME})
 
 
 def construct_zones(zones):
@@ -86,13 +88,13 @@ def construct_input(inp_id, inp):
              'Name': inp.name})
 
 
-def update_zone(zone, data):
+def update_zone(zone_id, data):
     parsed_data = json.loads(data)
     if 'Enabled' in parsed_data:
-        zone.enabled = parsed_data['Enabled']
+        web.audio_controller.set_zone_enabled(zone_id, parsed_data['Enabled'])
     if 'Volume' in parsed_data:
-        zone.volume = parsed_data['Volume']
-    return construct_zone(zone)
+        web.audio_controller.set_volume(zone_id, parsed_data['Volume'])
+    return construct_zone(web.audio_controller.zones[zone_id])
 
 
 def update_controller(controller, data):
