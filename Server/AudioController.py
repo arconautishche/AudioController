@@ -1,9 +1,15 @@
 from subprocess import Popen
+import spidev
 
 import yaml
 
 BCM_INPUT_ADDRESS = range(11, 14)  # little endian: first pin is least significant bit
 BCM_OUTPUTS = range(23, 26)
+
+
+class VolumeControl:
+    def __init__(self):
+        self.spi = spidev.SpiDev()
 
 
 class Zone:
@@ -93,6 +99,7 @@ class StreamInput(Input):
 
 class AudioController:
     def __init__(self, gpio):
+        self.zones = {}
         self.__gpio = gpio
         gpio.setmode(gpio.BCM)
         self.__output_volumes = [0] * len(BCM_OUTPUTS)
@@ -103,6 +110,24 @@ class AudioController:
         self.selected_input = 0
 
     def __create_zones(self):
+<<<<<<< HEAD
+        def create_zone(id, bcm, name):
+            self.zones[id] = Zone(self.__gpio, id, bcm, name)
+
+        create_zone(1, BCM_EETKAMER, 'Eetkamer')
+        create_zone(2, BCM_BADKAMER, 'Badkamer')
+        create_zone(3, BCM_TERRAS, 'Terras')
+
+    def __create_inputs(self):
+        self.inputs = {key: inpt for key, inpt in enumerate([
+            Input("None", self.__gpio, INPUT_ADDRESS_NONE),
+            SpotifyInput("Spotify", self.__gpio),
+            StreamInput("StuBru", self.__gpio, 'http://icecast.vrtcdn.be/stubru-high.mp3'),
+            StreamInput("Radio 1", self.__gpio, 'http://icecast.vrtcdn.be/radio1-high.mp3'),
+            StreamInput("Klara", self.__gpio, 'http://icecast.vrtcdn.be/klara-high.mp3'),
+            Input("Bluetooth", self.__gpio, INPUT_ADDRESS_BLUETOOTH)
+        ])}
+=======
         self.zones = {}
         for zone_id, name in config['zones'].items():
             self.zones[zone_id] = Zone(self.__gpio, zone_id, zone_id, name, self.__output_volumes)
@@ -112,6 +137,7 @@ class AudioController:
         for input_id, input_config in enumerate(config['inputs']):
             input_class = globals()[input_config['input_class']]
             self.inputs[input_id] = input_class(self.__gpio, input_config)
+>>>>>>> 53231e9550e20ef5ad21beb41527a139ac53f90f
 
     def __initialize_input_channels(self):
         for bcm in BCM_INPUT_ADDRESS:
