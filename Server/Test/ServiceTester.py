@@ -46,15 +46,6 @@ def select_input(input_id, wait=1):
     time.sleep(wait)
 
 
-enable_zone(0)
-# enable_zone(1)
-# enable_zone(2)
-# disable_zone(0)
-# disable_zone(1)
-# disable_zone(2)
-
-# select_input(0)
-select_input(0)
 # select_input(0)
 # select_input(2)
 # select_input(2)
