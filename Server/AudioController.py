@@ -6,6 +6,7 @@ import yaml
 BCM_INPUT_ADDRESS = (16, 20, 21)  # little endian: first pin is least significant bit
 BCM_OUTPUTS = range(23, 26)
 MAX_VOLUME = 133
+BCM_VOLUME_CS = 22
 
 
 # Zone = namedtuple('Zone', "zone_id name bcm enabled volume")
@@ -106,6 +107,7 @@ class AudioController:
         self._create_zones()
         self._initialize_input_channels()
         self._create_inputs()
+        self._initialize_volume_control()
 
         self.selected_input = 0
 
@@ -127,6 +129,12 @@ class AudioController:
         for bcm in BCM_INPUT_ADDRESS:
             self._gpio.setup(bcm, self._gpio.OUT, initial=self._gpio.HIGH)
 
+    def _initialize_volume_control(self):
+        spi = spidev.SpiDev()
+        spi.open(0, 0)
+        self._spi = spi
+        pass
+
     def select_input(self, input_id):
         if input_id not in self.inputs.keys():
             raise ValueError('Input id unknown')
@@ -144,6 +152,7 @@ class AudioController:
 
     def _send_volumes(self):
         output_volumes = [0] * len(BCM_OUTPUTS)
+        # self._spi.
 
     def set_zone_volume(self, zone_id, volume):
         zone = self.zones[zone_id]

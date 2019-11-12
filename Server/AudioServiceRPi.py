@@ -1,6 +1,6 @@
 import RPi.GPIO as GPIO
 
-import AudioRestService
+import RestService
 
 print('starting service...')
-AudioRestService.start_service(GPIO)
+RestService.start_service(GPIO)
