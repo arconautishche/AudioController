@@ -1,5 +1,4 @@
 import json
-from AudioController import AudioController, MAX_VOLUME
 import web
 
 urls = (
@@ -10,8 +9,7 @@ urls = (
 )
 
 
-def start_service(gpio):
-    ac = AudioController(gpio)
+def start_service(ac):
     app = web.application(urls, globals())
     web.audio_controller = ac
     app.run()
@@ -62,7 +60,7 @@ def construct_zone(zone):
              'Name': zone.name,
              'Enabled': zone.enabled,
              'Volume': zone.volume,
-             'MaxVolume': MAX_VOLUME})
+             'MaxVolume': web.audio_controller.MAX_VOLUME})
 
 
 def construct_zones(zones):
@@ -93,7 +91,7 @@ def update_zone(zone_id, data):
     if 'Enabled' in parsed_data:
         web.audio_controller.set_zone_enabled(zone_id, parsed_data['Enabled'])
     if 'Volume' in parsed_data:
-        web.audio_controller.set_volume(zone_id, parsed_data['Volume'])
+        web.audio_controller.set_zone_volume(zone_id, parsed_data['Volume'])
     return construct_zone(web.audio_controller.zones[zone_id])
 
 

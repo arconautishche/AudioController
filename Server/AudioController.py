@@ -1,19 +1,23 @@
 from subprocess import Popen
+from collections import OrderedDict
 import spidev
 
 import yaml
 
 BCM_INPUT_ADDRESS = (16, 20, 21)  # little endian: first pin is least significant bit
 BCM_OUTPUTS = range(23, 26)
-MAX_VOLUME = 133
+BCM_VOLUME_CS = 22
 
 
-# Zone = namedtuple('Zone', "zone_id name bcm enabled volume")
+class VolumeControl:
+    def __init__(self):
+        spi = spidev.SpiDev()
+        spi.open(0, 0)
+        self._spi = spi
+        pass
 
-
-# class VolumeControl:
-#     def __init__(self):
-#         self.spi = spidev.SpiDev()
+    def send_volumes(self, data):
+        self._spi.xfer2(data)
 
 
 # data class
@@ -24,31 +28,6 @@ class Zone:
         self.bcm = bcm
         self.enabled = enabled
         self.volume = volume
-
-
-#
-#     @property
-#     def enabled(self):
-#         return self.__enabled
-#
-#     @enabled.setter
-#     def enabled(self, new_val):
-#         if self.__enabled == new_val:
-#             return
-#         self.__enabled = new_val
-#         self.__gpio.output(self.__bcm, self.__gpio.LOW if self.__enabled else self.__gpio.HIGH)
-#
-#     @property
-#     def volume(self):
-#         return self.__output_volumes[self.id]
-#
-#     @volume.setter
-#     def volume(self, new_volume):
-#         self.__output_volumes[self.id] = max(0, min(new_volume, self.max_volume))
-#         self.__send_volume_signal()
-#
-#     def __send_volume_signal(self):
-#         pass  # todo
 
 
 class Input:
@@ -100,17 +79,20 @@ class StreamInput(Input):
 
 
 class AudioController:
-    def __init__(self, gpio):
+    MAX_VOLUME = 133
+
+    def __init__(self, gpio, volume_control=VolumeControl):
         self._gpio = gpio
         gpio.setmode(gpio.BCM)
         self._create_zones()
         self._initialize_input_channels()
         self._create_inputs()
+        self._volume_control = volume_control()
 
         self.selected_input = 0
 
     def _create_zones(self):
-        self.zones = {}
+        self.zones = OrderedDict()
         gpio = self._gpio
         for zone_id, name in config['zones'].items():
             bcm = BCM_OUTPUTS[zone_id]
@@ -143,11 +125,14 @@ class AudioController:
         self._gpio.output(zone.bcm, self._gpio.LOW if enabled else self._gpio.HIGH)
 
     def _send_volumes(self):
-        output_volumes = [0] * len(BCM_OUTPUTS)
+        volumes = [zone.volume for zone in self.zones.values()]
+        normalized_volumes = [int(256*vol / self.MAX_VOLUME) for vol in volumes]
+        data = bytes(normalized_volumes)
+        self._volume_control.send_volumes(data)
 
     def set_zone_volume(self, zone_id, volume):
         zone = self.zones[zone_id]
-        zone.volume = min(volume, MAX_VOLUME)
+        zone.volume = min(volume, self.MAX_VOLUME)
         self._send_volumes()
 
 
