@@ -102,3 +102,6 @@ ENV/
 .idea/Python.iml
 .idea/misc.xml
 .idea/workspace.xml
+
+# Idea SW
+.idea/
