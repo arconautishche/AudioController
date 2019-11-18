@@ -51,7 +51,7 @@ class Controller:
         return json.dumps(return_object)
 
     def PUT(self):
-        data = web.data()
+        data = web.data().decode('ascii')
         web.header('Content-Type', 'application/json')
         return json.dumps(update_controller(web.audio_controller, data))
 

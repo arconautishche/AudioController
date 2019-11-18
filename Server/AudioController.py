@@ -5,8 +5,7 @@ import spidev
 import json
 
 BCM_INPUT_ADDRESS = (16, 20, 21)  # little endian: first pin is least significant bit
-BCM_OUTPUTS = range(23, 26)
-BCM_VOLUME_CS = 22
+BCM_OUTPUTS = [23, 24, 25]
 
 
 class VolumeControl:
