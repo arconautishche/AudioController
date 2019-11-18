@@ -1,6 +1,7 @@
 from subprocess import Popen
 from collections import OrderedDict
 import spidev
+from logging import log, DEBUG
 
 import json
 
@@ -16,6 +17,7 @@ class VolumeControl:
         pass
 
     def send_volumes(self, data):
+        log(DEBUG, "sending to SPI:".format(data))
         self._spi.xfer2(data)
 
 
