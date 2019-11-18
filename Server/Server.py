@@ -1,5 +1,5 @@
 from AudioController import AudioController
-import json
+import yaml
 import logging
 
 import RestService
@@ -7,8 +7,8 @@ import RestService
 def StartServer(gpio, volume_control=None):
     print('starting service...')
     print('loading config...')
-    with open("config.json") as file:
-        config = json.loads(file.read())
+    with open("config.yaml") as file:
+        config = yaml.safe_load(file.read())
 
     if "log_level" in config:
         logging.basicConfig()
