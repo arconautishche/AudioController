@@ -17,7 +17,8 @@ class VolumeControl:
         pass
 
     def send_volumes(self, data):
-        log(DEBUG, "sending to SPI:".format(data))
+        data_binary = [bin(d) for d in data]
+        log(DEBUG, "sending to SPI:".format(data_binary))
         self._spi.xfer2(data)
 
 
