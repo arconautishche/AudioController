@@ -18,7 +18,7 @@ class VolumeControl:
 
     def send_volumes(self, data):
         data_binary_formatted = [bin(d) for d in data]
-        log(DEBUG, "sending to SPI:".format(data_binary_formatted))
+        log(DEBUG, "sending to SPI: {}".format(data_binary_formatted))
         self._spi.xfer2(data)
 
 
@@ -72,7 +72,7 @@ class StreamInput(Input):
 
     def enable(self):
         self.set_input()
-        self.player_process = Popen(["mpg123", self.url])
+        self.player_process = Popen(["mpg123", self.url + "-q"])
 
     def disable(self):
         if self.player_process and not self.player_process.poll():
@@ -127,13 +127,11 @@ class AudioController:
         self._gpio.output(zone.bcm, self._gpio.LOW if enabled else self._gpio.HIGH)
 
     def _send_volumes(self):
-        log(DEBUG, "zones len:".format(len(self.zones)))
-        log(DEBUG, "zones values len:".format(len(self.zones.values())))
-        volumes = [zone.volume for zone in self.zones.values()]
-        log(DEBUG, "zones volumes len:".format(len(volumes)))
-        normalized_volumes = [int(256 * vol / self.MAX_VOLUME) for vol in volumes]
-        log(DEBUG, "Normalized volumes:".format(normalized_volumes))
-        data = bytes(normalized_volumes)
+        volumes = []
+        for zone in self.zones.values():
+            norm_volume = int(256 * zone.volume / self.MAX_VOLUME)
+            volumes += 2*[norm_volume]
+        data = bytes(volumes)
         self._volume_control.send_volumes(data)
 
     def set_zone_volume(self, zone_id, volume):
