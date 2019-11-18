@@ -17,8 +17,8 @@ class VolumeControl:
         pass
 
     def send_volumes(self, data):
-        data_binary = [bin(d) for d in data]
-        log(DEBUG, "sending to SPI:".format(data_binary))
+        data_binary_formatted = [bin(d) for d in data]
+        log(DEBUG, "sending to SPI:".format(data_binary_formatted))
         self._spi.xfer2(data)
 
 
@@ -129,10 +129,12 @@ class AudioController:
     def _send_volumes(self):
         volumes = [zone.volume for zone in self.zones.values()]
         normalized_volumes = [int(256 * vol / self.MAX_VOLUME) for vol in volumes]
+        log(DEBUG, "Normalized volumes:".format(normalized_volumes))
         data = bytes(normalized_volumes)
         self._volume_control.send_volumes(data)
 
     def set_zone_volume(self, zone_id, volume):
+        log(DEBUG, "COMMAND: Set volume of zone {} to {}".format(zone_id, volume))
         zone = self.zones[zone_id]
         zone.volume = min(volume, self.MAX_VOLUME)
         self._send_volumes()
