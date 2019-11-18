@@ -35,5 +35,6 @@
     "1": "Badkamer",
     "2": "Terras"
   },
-  "input_address_rpi": 1
+  "input_address_rpi": 1,
+  "log_level": "DEBUG"
 }

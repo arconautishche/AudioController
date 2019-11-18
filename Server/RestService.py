@@ -1,5 +1,6 @@
 import json
 import web
+from logging import log, INFO, WARNING, ERROR
 
 urls = (
     '/AudioController/api/v1/controller', 'Controller',
@@ -87,6 +88,7 @@ def construct_input(inp_id, inp):
 
 
 def update_zone(zone_id, data):
+    log(INFO, "updating zone. data received: {}".format(data))
     parsed_data = json.loads(data)
     if 'Enabled' in parsed_data:
         web.audio_controller.set_zone_enabled(zone_id, parsed_data['Enabled'])

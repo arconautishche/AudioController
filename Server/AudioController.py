@@ -87,8 +87,7 @@ class AudioController:
         self._create_zones()
         self._initialize_input_channels()
         self._create_inputs()
-        self._volume_control = volume_control()
-
+        self._volume_control = volume_control() if volume_control else VolumeControl()
         self.selected_input = 0
 
     def _create_zones(self):
@@ -127,7 +126,7 @@ class AudioController:
 
     def _send_volumes(self):
         volumes = [zone.volume for zone in self.zones.values()]
-        normalized_volumes = [int(256*vol / self.MAX_VOLUME) for vol in volumes]
+        normalized_volumes = [int(256 * vol / self.MAX_VOLUME) for vol in volumes]
         data = bytes(normalized_volumes)
         self._volume_control.send_volumes(data)
 
