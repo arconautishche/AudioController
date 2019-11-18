@@ -5,7 +5,7 @@ from logging import log, DEBUG
 
 import json
 
-BCM_INPUT_ADDRESS = (16, 20, 21)  # little endian: first pin is least significant bit
+BCM_INPUT_ADDRESS = (20, 21)  # little endian: first pin is least significant bit
 BCM_OUTPUTS = [23, 24, 25]
 
 
@@ -13,7 +13,8 @@ class VolumeControl:
     def __init__(self):
         spi = spidev.SpiDev()
         spi.open(0, 0)
-        spi.max_speed_hz = 6250000
+        spi.max_speed_hz = 500000
+        spi.lsbfirst = True
         self._spi = spi
         pass
 
