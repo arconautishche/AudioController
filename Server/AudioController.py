@@ -127,10 +127,10 @@ class AudioController:
         self._gpio.output(zone.bcm, self._gpio.LOW if enabled else self._gpio.HIGH)
 
     def _send_volumes(self):
-        log(DEBUG, "zones:".format(self.zones))
-        log(DEBUG, "zones values:".format(self.zones.values()))
+        log(DEBUG, "zones len:".format(len(self.zones)))
+        log(DEBUG, "zones values len:".format(len(self.zones.values())))
         volumes = [zone.volume for zone in self.zones.values()]
-        log(DEBUG, "zones volumes:".format(volumes))
+        log(DEBUG, "zones volumes len:".format(len(volumes)))
         normalized_volumes = [int(256 * vol / self.MAX_VOLUME) for vol in volumes]
         log(DEBUG, "Normalized volumes:".format(normalized_volumes))
         data = bytes(normalized_volumes)
