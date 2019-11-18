@@ -23,7 +23,7 @@ class Zone:
         return json.dumps(construct_zone(zone))
 
     def PUT(self, zone):
-        data = web.data()
+        data = web.data().decode('ascii')
         zone_id = int(zone)
         web.header('Content-Type', 'application/json')
         return_object = update_zone(zone_id, data)
