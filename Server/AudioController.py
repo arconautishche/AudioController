@@ -13,6 +13,7 @@ class VolumeControl:
     def __init__(self):
         spi = spidev.SpiDev()
         spi.open(0, 0)
+        spi.max_speed_hz = 6250000
         self._spi = spi
         pass
 
