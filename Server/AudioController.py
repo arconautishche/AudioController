@@ -72,7 +72,7 @@ class StreamInput(Input):
 
     def enable(self):
         self.set_input()
-        self.player_process = Popen(["mpg123", self.url + "-q"])
+        self.player_process = Popen(["mpg123", self.url])
 
     def disable(self):
         if self.player_process and not self.player_process.poll():
