@@ -131,7 +131,7 @@ class AudioController:
     def _send_volumes(self):
         volumes = []
         for zone in self.zones.values():
-            norm_volume = int(256 * zone.volume / self.MAX_VOLUME)
+            norm_volume = min(int(256 * zone.volume / self.MAX_VOLUME), 255)
             volumes += 2*[norm_volume]
         data = bytes(volumes)
         self._volume_control.send_volumes(data)
