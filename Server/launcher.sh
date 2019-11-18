@@ -1,3 +1,3 @@
 cd /opt/audio
-sudo python LaunchRPi.py
+sudo python3 LaunchRPi.py
 cd /
