@@ -2,7 +2,7 @@ from subprocess import Popen
 from collections import OrderedDict
 import spidev
 
-import yaml
+import json
 
 BCM_INPUT_ADDRESS = (16, 20, 21)  # little endian: first pin is least significant bit
 BCM_OUTPUTS = range(23, 26)
@@ -94,7 +94,8 @@ class AudioController:
     def _create_zones(self):
         self.zones = OrderedDict()
         gpio = self._gpio
-        for zone_id, name in config['zones'].items():
+        for zone_id_string, name in config['zones'].items():
+            zone_id = int(zone_id_string)
             bcm = BCM_OUTPUTS[zone_id]
             self.zones[zone_id] = Zone(zone_id, name, bcm, False, 50)
             gpio.setup(bcm, gpio.OUT, initial=gpio.HIGH)  # configure gpio, default off
@@ -136,5 +137,5 @@ class AudioController:
         self._send_volumes()
 
 
-with open("config.yaml") as file:
-    config = yaml.safe_load(file)
+with open("config.json") as file:
+    config = json.loads(file.read())

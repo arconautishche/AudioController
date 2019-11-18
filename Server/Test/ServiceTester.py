@@ -19,9 +19,11 @@ def set_zone(zone_id, enabled=None, volume=None, wait=1):
     if volume is not None:
         payload['Volume'] = volume
     payload_str = json.dumps(payload)
-    print(payload_str)
     response = requests.put('{}/zones/{}'.format(server_address, zone_id), payload_str)
-    print(response.json())
+    try:
+        print(response.json())
+    except:
+        print(response)
     time.sleep(wait)
 
 
@@ -46,11 +48,20 @@ def select_input(input_id, wait=1):
     time.sleep(wait)
 
 
+get_zones()
+
 # select_input(0)
 # select_input(2)
 # select_input(2)
 # select_input(3)
 # select_input(4)
 # select_input(5)
+
+enable_zone(0)
+enable_zone(1)
+enable_zone(2)
+disable_zone(0)
+disable_zone(1)
+disable_zone(2)
 
 set_volume(0, 80)

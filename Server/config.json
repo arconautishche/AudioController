@@ -1,0 +1,39 @@
+{
+  "inputs": [
+    {
+      "name": "None",
+      "input_class": "AuxInput",
+      "address": false
+    },
+    {
+      "name": "Spotify",
+      "input_class": "SpotifyInput"
+    },
+    {
+      "name": "StuBru",
+      "input_class": "StreamInput",
+      "url": "http://icecast.vrtcdn.be/stubru-high.mp3"
+    },
+    {
+      "name": "Radio 1",
+      "input_class": "StreamInput",
+      "url": "http://icecast.vrtcdn.be/radio1-high.mp3"
+    },
+    {
+      "name": "Klara",
+      "input_class": "StreamInput",
+      "url": "http://icecast.vrtcdn.be/klara-high.mp3"
+    },
+    {
+      "name": "Bluetooth",
+      "input_class": "AuxInput",
+      "address": 2
+    }
+  ],
+  "zones": {
+    "0": "Eetkamer",
+    "1": "Badkamer",
+    "2": "Terras"
+  },
+  "input_address_rpi": 1
+}
