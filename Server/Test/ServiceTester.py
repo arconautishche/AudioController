@@ -2,8 +2,8 @@ import requests
 import json
 from time import sleep
 
-# server_address = 'http://localhost:8080/AudioController/api/v1/controller'
-server_address = 'http://192.168.1.43:8080/AudioController/api/v1/controller'
+server_address = 'http://localhost:8080/AudioController/api/v1/controller'
+# server_address = 'http://192.168.1.43:8080/AudioController/api/v1/controller'
 json_enable = '{"Enabled": true}'
 json_disable = '{"Enabled": false}'
 
@@ -68,11 +68,10 @@ select_input(2)
 # select_input(5)
 
 enable_zone(0)
-# enable_zone(1)
-# enable_zone(2)
-# disable_zone(0)
-# disable_zone(1)
-# disable_zone(2)
+enable_zone(1)
+disable_zone(0)
+enable_zone(2)
+disable_zone(1)
+disable_zone(2)
 
-
-set_volume(0, 133)
+# set_volume(0, 133)

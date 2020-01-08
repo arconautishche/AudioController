@@ -4,7 +4,7 @@ import logging
 
 import RestService
 
-def StartServer(gpio, volume_control=None):
+def StartServer(gpio):
     print('starting service...')
     print('loading config...')
     with open("config.yaml") as file:
@@ -14,5 +14,5 @@ def StartServer(gpio, volume_control=None):
         logging.basicConfig()
         logging.getLogger().setLevel(config["log_level"])
 
-    ac = AudioController(gpio, volume_control)
+    ac = AudioController(gpio)
     RestService.start_service(ac)

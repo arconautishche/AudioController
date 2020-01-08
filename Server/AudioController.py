@@ -8,20 +8,6 @@ BCM_INPUT_ADDRESS = (20, 21)  # little endian: first pin is least significant bi
 BCM_OUTPUTS = [22, 23, 24]
 BCM_PSU = 25
 
-class VolumeControl:
-    def __init__(self):
-        spi = spidev.SpiDev()
-        spi.open(0, 0)
-        spi.max_speed_hz = 500000
-        spi.lsbfirst = True
-        self._spi = spi
-        pass
-
-    def send_volumes(self, data):
-        data_binary_formatted = [bin(d) for d in data]
-        log(DEBUG, "sending to SPI: {}".format(data_binary_formatted))
-        self._spi.xfer2(data)
-
 
 # data class
 class Zone:
@@ -82,15 +68,12 @@ class StreamInput(Input):
 
 
 class AudioController:
-    MAX_VOLUME = 133
-
-    def __init__(self, gpio, volume_control=VolumeControl):
+    def __init__(self, gpio):
         self._gpio = gpio
         gpio.setmode(gpio.BCM)
         self._create_zones()
         self._initialize_input_channels()
         self._create_inputs()
-        self._volume_control = volume_control() if volume_control else VolumeControl()
         self.selected_input = 0
 
     def _create_zones(self):
@@ -100,6 +83,7 @@ class AudioController:
             bcm = BCM_OUTPUTS[zone_id]
             self.zones[zone_id] = Zone(zone_id, name, bcm, False, 50)
             gpio.setup(bcm, gpio.OUT, initial=gpio.HIGH)  # configure gpio, default off
+        gpio.setup(BCM_PSU, gpio.OUT, initial=gpio.HIGH)
 
     def _create_inputs(self):
         self.inputs = {}
@@ -119,26 +103,17 @@ class AudioController:
         self.selected_input = input_id
         self.inputs[input_id].enable()
 
+    def _set_psu(self):
+        psu_enabled = len([zone for zone in self.zones.values() if zone.enabled])
+        self._gpio.output(BCM_PSU, self._gpio.LOW if psu_enabled else self._gpio.HIGH)
+
     def set_zone_enabled(self, zone_id, enabled):
         zone = self.zones[zone_id]
         if zone.enabled == enabled:
             return
         zone.enabled = enabled
         self._gpio.output(zone.bcm, self._gpio.LOW if enabled else self._gpio.HIGH)
-
-    def _send_volumes(self):
-        volumes = []
-        for zone in self.zones.values():
-            norm_volume = min(int(256 * zone.volume / self.MAX_VOLUME), 255)
-            volumes += 2*[norm_volume]
-        data = bytes(volumes)
-        self._volume_control.send_volumes(data)
-
-    def set_zone_volume(self, zone_id, volume):
-        log(DEBUG, "COMMAND: Set volume of zone {} to {}".format(zone_id, volume))
-        zone = self.zones[zone_id]
-        zone.volume = min(volume, self.MAX_VOLUME)
-        self._send_volumes()
+        self._set_psu()
 
 
 with open("config.yaml") as file:

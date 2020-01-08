@@ -59,9 +59,7 @@ class Controller:
 def construct_zone(zone):
     return ({'ZoneId': zone.id,
              'Name': zone.name,
-             'Enabled': zone.enabled,
-             'Volume': zone.volume,
-             'MaxVolume': web.audio_controller.MAX_VOLUME})
+             'Enabled': zone.enabled})
 
 
 def construct_zones(zones):
@@ -92,8 +90,6 @@ def update_zone(zone_id, data):
     parsed_data = json.loads(data)
     if 'Enabled' in parsed_data:
         web.audio_controller.set_zone_enabled(zone_id, parsed_data['Enabled'])
-    if 'Volume' in parsed_data:
-        web.audio_controller.set_zone_volume(zone_id, parsed_data['Volume'])
     return construct_zone(web.audio_controller.zones[zone_id])
 
 
