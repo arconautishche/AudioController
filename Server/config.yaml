@@ -13,6 +13,9 @@ inputs:
   - name: Klara
     input_class: StreamInput
     url: http://icecast.vrtcdn.be/klara-high.mp3
+  - name: MNM
+    input_class: StreamInput
+    url: http://icecast.vrtcdn.be/mnm-high.mp3
   - name: Bluetooth
     input_class: AuxInput
     address: 2
