@@ -49,7 +49,7 @@ public class ControllerModel {
         this.mControllerServerUrl = mControllerUrl;
     }
 
-    public void requestInputs(final Response.Listener<ArrayList<AudioInput>> successHandler, Response.ErrorListener errorHandler) {
+    public void requestStatus(final Response.Listener<ControllerStatus> successHandler, Response.ErrorListener errorHandler){
         String url = mControllerServerUrl + CONTROLLER_URL;
 
         // Request a string response from the AudioController URL.
@@ -59,7 +59,7 @@ public class ControllerModel {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        successHandler.onResponse((ArrayList<AudioInput>) ExtractInputs(response));
+                        successHandler.onResponse((ControllerStatus) ExtractControllerStatus(response));
                     }
                 },
                 errorHandler);
@@ -67,23 +67,7 @@ public class ControllerModel {
         mQueue.add(stringRequest);
     }
 
-    public void requestZones(final Response.Listener<ArrayList<AudioZone>> successHandler, Response.ErrorListener errorHandler) {
-        String url = mControllerServerUrl + ZONES_URL;
 
-        // Request a string response from the AudioController URL.
-        StringRequest stringRequest = new StringRequest(
-                Request.Method.GET,
-                url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        successHandler.onResponse((ArrayList<AudioZone>) ExtractZones(response));
-                    }
-                },
-                errorHandler);
-
-        mQueue.add(stringRequest);
-    }
 
 
     public void setZoneEnabled(final AudioZone zone) {
@@ -176,12 +160,28 @@ public class ControllerModel {
         mQueue.add(putRequest);
     }
 
-    private List<AudioZone> ExtractZones(String response)
+    private ControllerStatus ExtractControllerStatus(String response){
+        ControllerStatus controllerStatus = new ControllerStatus();
+
+        try {
+            JSONObject responseInJSON = new JSONObject(response);
+            controllerStatus.setZones(ExtractZones(responseInJSON));
+            controllerStatus.setInputs(ExtractInputs(responseInJSON));
+            controllerStatus.setMasterVolume(responseInJSON.getInt("MasterVolume"));
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return controllerStatus;
+    }
+
+    private List<AudioZone> ExtractZones(JSONObject response)
     {
         List<AudioZone> zones = new ArrayList<>();
 
         try {
-            JSONArray zonesInJson = new JSONArray(response);
+            JSONArray zonesInJson = response.getJSONArray("Zones");
 
             for (int i = 0; i < zonesInJson.length(); i++) {
                 JSONObject zoneJson = zonesInJson.getJSONObject(i);
@@ -203,15 +203,15 @@ public class ControllerModel {
         return zones;
     }
 
-    private List<AudioInput> ExtractInputs(String response)
+    private List<AudioInput> ExtractInputs(JSONObject response)
     {
         List<AudioInput> inputs = new ArrayList<>();
 
         try {
-            JSONObject responseInJSON = new JSONObject(response);
 
-            int activeInput = responseInJSON.getInt("SelectedInput");
-            JSONArray inputsInJSON = responseInJSON.getJSONArray("Inputs");
+            int activeInput = response.getInt("SelectedInput");
+            response.getJSONObject("test");
+            JSONArray inputsInJSON = response.getJSONArray("Inputs");
 
             for (int i = 0; i < inputsInJSON.length(); i++) {
                 JSONObject zoneJson = inputsInJSON.getJSONObject(i);

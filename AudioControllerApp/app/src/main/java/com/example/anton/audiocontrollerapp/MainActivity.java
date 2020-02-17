@@ -26,6 +26,8 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -55,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public class OnVolumeBarChangeListener implements SeekBar.OnSeekBarChangeListener {
         private ControllerModel mController;
         private int val;
+        private Date lastUpdate=new Date();
 
         public OnVolumeBarChangeListener(ControllerModel controllerModel){
             mController=controllerModel;
@@ -63,6 +66,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         @Override
         public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
             val = i;
+            if ((new Date()).getTime() - lastUpdate.getTime() > 200){
+                mController.setMasterVolume(val);
+            }
         }
 
         @Override
@@ -81,11 +87,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void Refresh() {
-        mController.requestZones(
-                new Response.Listener<ArrayList<AudioZone>>() {
+        mController.requestStatus(
+                new Response.Listener<ControllerStatus>() {
                     @Override
-                    public void onResponse(ArrayList<AudioZone> zones) {
-                        ProcessZones(zones);
+                    public void onResponse(ControllerStatus controllerStatus) {
+                        ProcessControllerStatus(controllerStatus);
                     }
                 },
                 new Response.ErrorListener() {
@@ -93,32 +99,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(
                                 getApplicationContext(),
-                                "Error with zones: " + error.toString(),
+                                "Error with Controller Status: " + error.toString(),
                                 Toast.LENGTH_LONG).show();
                     }
                 });
-
-        mController.requestInputs(
-                new Response.Listener<ArrayList<AudioInput>>() {
-                    @Override
-                    public void onResponse(ArrayList<AudioInput> zones) {
-                        ProcessInputs(zones);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(
-                                getApplicationContext(),
-                                "Error with inputs: " + error.toString(),
-                                Toast.LENGTH_LONG).show();
-                    }
-                });
-
-
     }
 
-    private void ProcessZones(ArrayList<AudioZone> zones) {
+    private void ProcessControllerStatus(ControllerStatus controllerStatus){
+        ProcessInputs(controllerStatus.getInputs());
+        ProcessZones(controllerStatus.getZones());
+        mVolumeSeekBar.setProgress(controllerStatus.getmMasterVolume());
+    }
+
+    private void ProcessZones(List<AudioZone> zones) {
 
         int howMany = zones.size();
         Toast.makeText(getApplicationContext(), "Zones: " + howMany, Toast.LENGTH_LONG).show();
@@ -129,11 +122,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             AudioZone zone = zones.get(i);
             createViewForZone(zone);
         }
-
-        return;
     }
 
-    private void ProcessInputs(ArrayList<AudioInput> inputs) {
+    private void ProcessInputs(List<AudioInput> inputs) {
 
         int howMany = inputs.size();
         Toast.makeText(getApplicationContext(), "Inputs: " + howMany, Toast.LENGTH_LONG).show();
@@ -155,8 +146,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         mActiveInputSelector.setAdapter(inputsAdapter);
         mActiveInputSelector.setSelection(active);
-
-        return;
     }
 
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
