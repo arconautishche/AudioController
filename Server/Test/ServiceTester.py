@@ -35,8 +35,13 @@ def disable_zone(zone_id, wait=1):
     set_zone(zone_id, False, wait=wait)
 
 
-def set_volume(zone_id, volume):
-    set_zone(zone_id, volume=volume)
+def set_volume(volume, wait=1):
+    response = requests.put(server_address, '{{"MasterVolume": {}}}'.format(volume))
+    try:
+        print(response.json())
+    except:
+        print(response)
+    sleep(wait)
 
 
 def select_input(input_id, wait=1):
@@ -60,18 +65,22 @@ def volume_loop(low, high, period):
 
 get_zones()
 
-# select_input(0)
+select_input(1)
 # select_input(2)
-select_input(2)
+# select_input(2)
 # select_input(3)
 # select_input(4)
 # select_input(5)
 
-enable_zone(0)
-enable_zone(1)
-disable_zone(0)
-enable_zone(2)
-disable_zone(1)
-disable_zone(2)
+# enable_zone(0)
+# enable_zone(1)
+# disable_zone(0)
+# enable_zone(2)
+# disable_zone(1)
+# disable_zone(2)
 
-# set_volume(0, 133)
+set_volume(0)
+set_volume(50)
+set_volume(100)
+set_volume(50)
+set_volume(0)

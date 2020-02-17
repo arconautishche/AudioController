@@ -3,6 +3,7 @@ from collections import OrderedDict
 import spidev
 from logging import log, DEBUG
 import yaml
+import alsaaudio
 
 BCM_INPUT_ADDRESS = (20, 21)  # little endian: first pin is least significant bit
 BCM_OUTPUTS = [22, 23, 24]
@@ -75,6 +76,19 @@ class AudioController:
         self._initialize_input_channels()
         self._create_inputs()
         self.selected_input = 0
+
+    @property
+    def master_volume(self):
+        mixer = alsaaudio.Mixer()
+        volume = mixer.getvolume()
+        return int(volume[0])
+
+    @master_volume.setter
+    def master_volume(self, val):
+        mixer = alsaaudio.Mixer()
+        volume = mixer.setvolume(val)
+        return int(volume[0])
+
 
     def _create_zones(self):
         self.zones = OrderedDict()

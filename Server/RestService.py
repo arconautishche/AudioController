@@ -71,7 +71,9 @@ def construct_zones(zones):
 def construct_controller(audio_controller):
     return ({'Inputs': construct_inputs(audio_controller.inputs),
              'Zones': construct_zones(audio_controller.zones),
-             'SelectedInput': audio_controller.selected_input})
+             'SelectedInput': audio_controller.selected_input,
+             'MasterVolume': audio_controller.master_volume,
+             })
 
 
 def construct_inputs(inputs):
@@ -95,5 +97,8 @@ def update_zone(zone_id, data):
 
 def update_controller(controller, data):
     parsed_data = json.loads(data)
-    controller.select_input(parsed_data['SelectedInput'])
+    if 'MasterVolume' in parsed_data:
+        controller.master_volume = max(min(int(parsed_data['MasterVolume']), 100), 0)
+    if 'SelectedInput' in parsed_data:
+        controller.select_input(parsed_data['SelectedInput'])
     return {'SelectedInput': controller.selected_input}

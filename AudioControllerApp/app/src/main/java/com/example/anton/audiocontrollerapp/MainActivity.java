@@ -10,6 +10,7 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
+import android.widget.SeekBar;
 import android.widget.ToggleButton;
 
 import com.android.volley.Request;
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private LinearLayout mZonesContainer;
     private ControllerModel mController;
     private Spinner mActiveInputSelector;
+    private SeekBar mVolumeSeekBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,11 +43,38 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mActiveInputSelector = (Spinner)findViewById(R.id.activeInputSelector);
         mActiveInputSelector.setOnItemSelectedListener(this);
 
-        mController = new ControllerModel(this, "http://192.168.1.43:8080");
+//        mController = new ControllerModel(this, "http://192.168.1.43:8080");
+        mController = new ControllerModel(this, "http://192.168.1.3:8080");
+
+        mVolumeSeekBar=(SeekBar)findViewById(R.id.volumeSeekBar);
+        mVolumeSeekBar.setOnSeekBarChangeListener(new OnVolumeBarChangeListener(mController));
 
         Refresh();
     }
 
+    public class OnVolumeBarChangeListener implements SeekBar.OnSeekBarChangeListener {
+        private ControllerModel mController;
+        private int val;
+
+        public OnVolumeBarChangeListener(ControllerModel controllerModel){
+            mController=controllerModel;
+        }
+
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            val = i;
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+            mController.setMasterVolume(val);
+        }
+    }
 
     public void onRefreshClick(View view) {
         Refresh();

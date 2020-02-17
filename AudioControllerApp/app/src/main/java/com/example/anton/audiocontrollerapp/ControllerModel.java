@@ -85,6 +85,7 @@ public class ControllerModel {
         mQueue.add(stringRequest);
     }
 
+
     public void setZoneEnabled(final AudioZone zone) {
         String url = mControllerServerUrl + ZONES_URL + "/" + zone.getID();
 
@@ -121,6 +122,36 @@ public class ControllerModel {
         JSONObject json = new JSONObject();
         try {
             json.put("SelectedInput", input.getID());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest putRequest = new JsonObjectRequest(Request.Method.PUT, url, json,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // response
+                        Log.d("Response", response.toString());
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // error
+                        Log.d("Error.Response", "blah");
+                    }
+                }
+        );
+
+        mQueue.add(putRequest);
+    }
+
+    public void setMasterVolume(final int volume){
+        String url = mControllerServerUrl + CONTROLLER_URL;
+
+        JSONObject json = new JSONObject();
+        try {
+            json.put("MasterVolume", volume);
         } catch (JSONException e) {
             e.printStackTrace();
         }
