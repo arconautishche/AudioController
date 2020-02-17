@@ -79,16 +79,15 @@ class AudioController:
 
     @property
     def master_volume(self):
-        mixer = alsaaudio.Mixer()
-        volume = mixer.getvolume()
+        volume = self._get_mixer().getvolume()
         return int(volume[0])
 
     @master_volume.setter
     def master_volume(self, val):
-        mixer = alsaaudio.Mixer()
-        volume = mixer.setvolume(val)
-        return int(volume[0])
+        self._get_mixer().setvolume(val)
 
+    def _get_mixer(self):
+        return alsaaudio.Mixer(alsaaudio.mixers()[0])
 
     def _create_zones(self):
         self.zones = OrderedDict()
