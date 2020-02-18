@@ -45,8 +45,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mActiveInputSelector = (Spinner)findViewById(R.id.activeInputSelector);
         mActiveInputSelector.setOnItemSelectedListener(this);
 
-//        mController = new ControllerModel(this, "http://192.168.1.43:8080");
-        mController = new ControllerModel(this, "http://192.168.1.3:8080");
+        mController = new ControllerModel(this, "http://192.168.1.43:8080");
+//        mController = new ControllerModel(this, "http://192.168.1.3:8080");
 
         mVolumeSeekBar=(SeekBar)findViewById(R.id.volumeSeekBar);
         mVolumeSeekBar.setOnSeekBarChangeListener(new OnVolumeBarChangeListener(mController));
