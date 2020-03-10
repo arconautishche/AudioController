@@ -4,6 +4,7 @@ import spidev
 from logging import log, DEBUG
 import yaml
 import alsaaudio
+import math
 
 BCM_INPUT_ADDRESS = (20, 21)  # little endian: first pin is least significant bit
 BCM_OUTPUTS = [22, 23, 24]
@@ -79,12 +80,14 @@ class AudioController:
 
     @property
     def master_volume(self):
-        volume = self._get_mixer().getvolume()
-        return int(volume[0])
+        linear_volume = int(self._get_mixer().getvolume()[0])
+        cubic_volume = int(100*(linear_volume/133)**2)
+        return cubic_volume
 
     @master_volume.setter
     def master_volume(self, val):
-        self._get_mixer().setvolume(val)
+        linear_volume = int(133*(math.sqrt(val/100)))
+        self._get_mixer().setvolume(linear_volume)
 
     def _get_mixer(self):
         return alsaaudio.Mixer(alsaaudio.mixers()[0])
