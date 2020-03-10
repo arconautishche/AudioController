@@ -4,11 +4,11 @@ import spidev
 from logging import log, DEBUG
 import yaml
 import alsaaudio
+import jack
 
 BCM_INPUT_ADDRESS = (20, 21)  # little endian: first pin is least significant bit
 BCM_OUTPUTS = [22, 23, 24]
 BCM_PSU = 25
-
 
 # data class
 class Zone:
@@ -17,7 +17,9 @@ class Zone:
         self.name = name
         self.bcm = bcm
         self.enabled = enabled
-        self.volume = volume
+
+        self._jack_client = jack.Client('ac_zone_' + self.id)
+
 
 
 class Input:
@@ -75,7 +77,8 @@ class AudioController:
         self._create_zones()
         self._initialize_input_channels()
         self._create_inputs()
-        self.selected_input = 0
+        self._selected_input = 0
+        self._jack_client = jack.Client('audio_controller')
 
     @property
     def master_volume(self):
@@ -112,8 +115,8 @@ class AudioController:
         if input_id not in self.inputs.keys():
             raise ValueError('Input id unknown')
 
-        self.inputs[self.selected_input].disable()
-        self.selected_input = input_id
+        self.inputs[self._selected_input].disable()
+        self._selected_input = input_id
         self.inputs[input_id].enable()
 
     def _set_psu(self):
