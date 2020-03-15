@@ -42,13 +42,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         setContentView(R.layout.activity_main);
 
         mZonesContainer = (LinearLayout) findViewById(R.id.zonesContainer);
-        mActiveInputSelector = (Spinner)findViewById(R.id.activeInputSelector);
+        mActiveInputSelector = (Spinner) findViewById(R.id.activeInputSelector);
         mActiveInputSelector.setOnItemSelectedListener(this);
 
         mController = new ControllerModel(this, "http://192.168.1.43:8080");
 //        mController = new ControllerModel(this, "http://192.168.1.3:8080");
 
-        mVolumeSeekBar=(SeekBar)findViewById(R.id.volumeSeekBar);
+        mVolumeSeekBar = (SeekBar) findViewById(R.id.volumeSeekBar);
         mVolumeSeekBar.setOnSeekBarChangeListener(new OnVolumeBarChangeListener(mController));
 
         Refresh();
@@ -57,16 +57,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public class OnVolumeBarChangeListener implements SeekBar.OnSeekBarChangeListener {
         private ControllerModel mController;
         private int val;
-        private Date lastUpdate=new Date();
+        private Date lastUpdate = new Date();
 
-        public OnVolumeBarChangeListener(ControllerModel controllerModel){
-            mController=controllerModel;
+        public OnVolumeBarChangeListener(ControllerModel controllerModel) {
+            mController = controllerModel;
         }
 
         @Override
         public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
             val = i;
-            if ((new Date()).getTime() - lastUpdate.getTime() > 200){
+            if ((new Date()).getTime() - lastUpdate.getTime() > 200) {
+                lastUpdate = new Date();
                 mController.setMasterVolume(val);
             }
         }
@@ -105,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 });
     }
 
-    private void ProcessControllerStatus(ControllerStatus controllerStatus){
+    private void ProcessControllerStatus(ControllerStatus controllerStatus) {
         ProcessInputs(controllerStatus.getInputs());
         ProcessZones(controllerStatus.getZones());
         mVolumeSeekBar.setProgress(controllerStatus.getmMasterVolume());

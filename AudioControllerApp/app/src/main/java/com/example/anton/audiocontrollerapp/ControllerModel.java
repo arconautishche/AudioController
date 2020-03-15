@@ -210,7 +210,7 @@ public class ControllerModel {
         try {
 
             int activeInput = response.getInt("SelectedInput");
-            response.getJSONObject("test");
+//            response.getJSONObject("test");
             JSONArray inputsInJSON = response.getJSONArray("Inputs");
 
             for (int i = 0; i < inputsInJSON.length(); i++) {
