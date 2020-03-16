@@ -3,6 +3,7 @@ package com.example.anton.audiocontrollerapp;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
 
+
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private LinearLayout mZonesContainer;
@@ -52,6 +54,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mVolumeSeekBar.setOnSeekBarChangeListener(new OnVolumeBarChangeListener(mController));
 
         Refresh();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch(keyCode){
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                mVolumeSeekBar.setProgress(Math.max(mVolumeSeekBar.getProgress()-5,0));
+                break;
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                mVolumeSeekBar.setProgress(Math.min(mVolumeSeekBar.getProgress()+5,100));
+                break;
+        }
+        return true;
     }
 
     public class OnVolumeBarChangeListener implements SeekBar.OnSeekBarChangeListener {
