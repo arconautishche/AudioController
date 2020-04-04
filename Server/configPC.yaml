@@ -25,4 +25,4 @@ zones:  # address: name
 input_address_rpi : 1
 log_level: DEBUG
 
-emulated: False
+emulated: True

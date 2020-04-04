@@ -5,6 +5,7 @@ from logging import log, DEBUG
 import yaml
 import alsaaudio
 import math
+from Config import config
 
 BCM_INPUT_ADDRESS = (20, 21)  # little endian: first pin is least significant bit
 BCM_OUTPUTS = [22, 23, 24]
@@ -70,9 +71,13 @@ class StreamInput(Input):
 
 
 class AudioController:
-    def __init__(self, gpio):
-        self._gpio = gpio
-        gpio.setmode(gpio.BCM)
+    def __init__(self):
+        if config()["emulated"]:
+            from Emulator.EmulatorGUI import GPIO
+        else:
+            import RPi.GPIO as GPIO
+        self._gpio = GPIO
+        self._gpio.setmode(GPIO.BCM)
         self._create_zones()
         self._initialize_input_channels()
         self._create_inputs()
@@ -95,7 +100,7 @@ class AudioController:
     def _create_zones(self):
         self.zones = OrderedDict()
         gpio = self._gpio
-        for zone_id, name in config['zones'].items():
+        for zone_id, name in config()['zones'].items():
             bcm = BCM_OUTPUTS[zone_id]
             self.zones[zone_id] = Zone(zone_id, name, bcm, False, 50)
             gpio.setup(bcm, gpio.OUT, initial=gpio.HIGH)  # configure gpio, default off
@@ -130,7 +135,3 @@ class AudioController:
         zone.enabled = enabled
         self._gpio.output(zone.bcm, self._gpio.LOW if enabled else self._gpio.HIGH)
         self._set_psu()
-
-
-with open("config.yaml") as file:
-    config = yaml.safe_load(file)

@@ -1,18 +1,24 @@
 from AudioController import AudioController
-import yaml
 import logging
+import Config
+from Config import config
 
 import RestService
 
-def StartServer(gpio):
+
+def start_server():
     print('starting service...')
+    Config.load()
+    print(config())
+
     print('loading config...')
-    with open("config.yaml") as file:
-        config = yaml.safe_load(file.read())
 
-    if "log_level" in config:
+    if "log_level" in config():
         logging.basicConfig()
-        logging.getLogger().setLevel(config["log_level"])
+        logging.getLogger().setLevel(config()["log_level"])
 
-    ac = AudioController(gpio)
+    ac = AudioController()
     RestService.start_service(ac)
+
+
+start_server()
