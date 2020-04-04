@@ -11,7 +11,7 @@ def load():
     with open(args.config_file) as file:
         global _config
         _config = yaml.safe_load(file.read())
-        print(_config)
+
 
 def config():
     return _config

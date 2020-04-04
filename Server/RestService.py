@@ -1,6 +1,7 @@
 import json
 import web
 from logging import log, INFO, WARNING, ERROR
+import sys
 
 urls = (
     '/AudioController/api/v1/controller', 'Controller',
@@ -11,6 +12,7 @@ urls = (
 
 
 def start_service(ac):
+    sys.argv = [sys.argv[0]]  # remove all arguments as they would be interpreted as arguments by app.run() call
     app = web.application(urls, globals())
     web.audio_controller = ac
     app.run()

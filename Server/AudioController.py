@@ -6,6 +6,7 @@ import yaml
 import alsaaudio
 import math
 from Config import config
+import threading
 
 BCM_INPUT_ADDRESS = (20, 21)  # little endian: first pin is least significant bit
 BCM_OUTPUTS = [22, 23, 24]
@@ -48,7 +49,7 @@ class AuxInput(Input):
 
 class SpotifyInput(Input):
     def __init__(self, gpio, input_config):
-        Input.__init__(self, gpio, input_config['name'], config['input_address_rpi'])
+        Input.__init__(self, gpio, input_config['name'], config()['input_address_rpi'])
 
     def disable(self):
         pass  # todo Stop Spotify
@@ -56,7 +57,7 @@ class SpotifyInput(Input):
 
 class StreamInput(Input):
     def __init__(self, gpio, input_config):
-        Input.__init__(self, gpio, input_config['name'], config['input_address_rpi'])
+        Input.__init__(self, gpio, input_config['name'], config()['input_address_rpi'])
         self.url = input_config['url']
         self.player_process = None
 
@@ -76,6 +77,7 @@ class AudioController:
             from Emulator.EmulatorGUI import GPIO
         else:
             import RPi.GPIO as GPIO
+        self._lock = threading.Lock()
         self._gpio = GPIO
         self._gpio.setmode(GPIO.BCM)
         self._create_zones()
@@ -86,13 +88,14 @@ class AudioController:
     @property
     def master_volume(self):
         linear_volume = int(self._get_mixer().getvolume()[0])
-        cubic_volume = int(100*(linear_volume/100)**2)
+        cubic_volume = int(100 * (linear_volume / 100) ** 2)
         return cubic_volume
 
     @master_volume.setter
     def master_volume(self, val):
-        linear_volume = int(100*(math.sqrt(val/100)))
-        self._get_mixer().setvolume(linear_volume)
+        linear_volume = int(100 * (math.sqrt(val / 100)))
+        with self._lock:
+            self._get_mixer().setvolume(linear_volume)
 
     def _get_mixer(self):
         return alsaaudio.Mixer(alsaaudio.mixers()[0])
@@ -108,7 +111,7 @@ class AudioController:
 
     def _create_inputs(self):
         self.inputs = {}
-        for input_id, input_config in enumerate(config['inputs']):
+        for input_id, input_config in enumerate(config()['inputs']):
             input_class = globals()[input_config['input_class']]
             self.inputs[input_id] = input_class(self._gpio, input_config)
 
@@ -120,18 +123,20 @@ class AudioController:
         if input_id not in self.inputs.keys():
             raise ValueError('Input id unknown')
 
-        self.inputs[self.selected_input].disable()
-        self.selected_input = input_id
-        self.inputs[input_id].enable()
+        with self._lock:
+            self.inputs[self.selected_input].disable()
+            self.selected_input = input_id
+            self.inputs[input_id].enable()
 
     def _set_psu(self):
         psu_enabled = len([zone for zone in self.zones.values() if zone.enabled])
         self._gpio.output(BCM_PSU, self._gpio.LOW if psu_enabled else self._gpio.HIGH)
 
     def set_zone_enabled(self, zone_id, enabled):
-        zone = self.zones[zone_id]
-        if zone.enabled == enabled:
-            return
-        zone.enabled = enabled
-        self._gpio.output(zone.bcm, self._gpio.LOW if enabled else self._gpio.HIGH)
-        self._set_psu()
+        with self._lock:
+            zone = self.zones[zone_id]
+            if zone.enabled == enabled:
+                return
+            zone.enabled = enabled
+            self._gpio.output(zone.bcm, self._gpio.LOW if enabled else self._gpio.HIGH)
+            self._set_psu()

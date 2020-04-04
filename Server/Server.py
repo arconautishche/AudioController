@@ -8,10 +8,8 @@ import RestService
 
 def start_server():
     print('starting service...')
-    Config.load()
-    print(config())
-
     print('loading config...')
+    Config.load()
 
     if "log_level" in config():
         logging.basicConfig()
