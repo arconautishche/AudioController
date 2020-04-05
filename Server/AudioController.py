@@ -11,8 +11,8 @@ BCM_INPUT_ADDRESS = (20, 21)  # little endian: first pin is least significant bi
 BCM_OUTPUTS = [22, 23, 24]
 BCM_PSU = 25
 
-TIMEOUT = 5
-DEAMON_INTERVAL = 2
+TIMEOUT = 60
+DEAMON_INTERVAL = 10
 
 
 # data class
