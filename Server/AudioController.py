@@ -3,6 +3,7 @@ from collections import OrderedDict
 import time
 import alsaaudio
 import math
+import os
 from Config import config
 import threading
 from logging import info, debug, warn
@@ -54,7 +55,7 @@ class SpotifyInput(Input):
         Input.__init__(self, gpio, input_config['name'], config()['input_address_rpi'])
 
     def disable(self):
-        pass  # todo Stop Spotify
+        os.system("sudo systemctl restart raspotify")
 
 
 class StreamInput(Input):
@@ -136,6 +137,8 @@ class AudioController:
             raise ValueError('Input id unknown')
 
         with self._lock:
+            if input_id == self.selected_input:
+                return
             self.inputs[self.selected_input].disable()
             self.selected_input = input_id
             self.inputs[input_id].enable()

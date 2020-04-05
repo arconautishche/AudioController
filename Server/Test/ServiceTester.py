@@ -66,7 +66,9 @@ def volume_loop(low, high, period):
 get_zones()
 
 select_input(0)
-# select_input(2)
+select_input(1)
+select_input(0)
+
 # select_input(2)
 # select_input(3)
 # select_input(4)
