@@ -1,19 +1,13 @@
 from AudioController import AudioController
-import logging
 import Config
-from Config import config
-
 import RestService
-
+from logging import info
 
 def start_server():
     print('starting service...')
     print('loading config...')
     Config.load()
-
-    if "log_level" in config():
-        logging.basicConfig()
-        logging.getLogger().setLevel(config()["log_level"])
+    info("Config loaded")
 
     ac = AudioController()
     RestService.start_service(ac)

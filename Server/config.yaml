@@ -23,6 +23,6 @@ zones:  # address: name
   2: Terras
 
 input_address_rpi : 1
-log_level: DEBUG
+log_level: INFO
 
 emulated: False

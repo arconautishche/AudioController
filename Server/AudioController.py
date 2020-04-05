@@ -1,16 +1,18 @@
 from subprocess import Popen
 from collections import OrderedDict
-import spidev
-from logging import log, DEBUG
-import yaml
+import time
 import alsaaudio
 import math
 from Config import config
 import threading
+from logging import info, debug, warn
 
 BCM_INPUT_ADDRESS = (20, 21)  # little endian: first pin is least significant bit
 BCM_OUTPUTS = [22, 23, 24]
 BCM_PSU = 25
+
+TIMEOUT = 5
+DEAMON_INTERVAL = 2
 
 
 # data class
@@ -77,13 +79,19 @@ class AudioController:
             from Emulator.EmulatorGUI import GPIO
         else:
             import RPi.GPIO as GPIO
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
         self._gpio = GPIO
         self._gpio.setmode(GPIO.BCM)
         self._create_zones()
+        self._last_update = time.time()
         self._initialize_input_channels()
         self._create_inputs()
         self.selected_input = 0
+
+        thread = threading.Thread(target=self.daemon_loop, daemon=True)
+        thread.start()
+
+        info("AudioController initialized")
 
     @property
     def master_volume(self):
@@ -96,6 +104,10 @@ class AudioController:
         linear_volume = int(100 * (math.sqrt(val / 100)))
         with self._lock:
             self._get_mixer().setvolume(linear_volume)
+            self._updated()
+
+    def _updated(self):
+        self._last_update = time.time()
 
     def _get_mixer(self):
         return alsaaudio.Mixer(alsaaudio.mixers()[0])
@@ -127,12 +139,14 @@ class AudioController:
             self.inputs[self.selected_input].disable()
             self.selected_input = input_id
             self.inputs[input_id].enable()
+            self._updated()
 
     def _set_psu(self):
         psu_enabled = len([zone for zone in self.zones.values() if zone.enabled])
         self._gpio.output(BCM_PSU, self._gpio.LOW if psu_enabled else self._gpio.HIGH)
 
     def set_zone_enabled(self, zone_id, enabled):
+        info("{} zone {}".format("Enabling" if enabled else "Disabling", zone_id))
         with self._lock:
             zone = self.zones[zone_id]
             if zone.enabled == enabled:
@@ -140,3 +154,29 @@ class AudioController:
             zone.enabled = enabled
             self._gpio.output(zone.bcm, self._gpio.LOW if enabled else self._gpio.HIGH)
             self._set_psu()
+            self._updated()
+
+    def daemon_loop(self):
+        while True:
+            time.sleep(DEAMON_INTERVAL)
+            debug("Daemon checking inputs and zones...")
+            with self._lock:
+                since_last_update = time.time() - self._last_update
+                if since_last_update > TIMEOUT:
+                    if all(not zone.enabled for zone in self.zones.values()) and not self.selected_input == 0:
+                        info("No zones were enabled for {} seconds while input on. Setting input to None...".format(
+                            since_last_update))
+                        self.selected_input = 0
+                    if any(zone.enabled for zone in self.zones.values()) and self.selected_input == 0:
+                        info(
+                            "Some zones were enabled for {} seconds while no input selected. Closing all zones...".format(
+                                since_last_update))
+                        for id, zone in self.zones.items():
+                            self.set_zone_enabled(id, False)
+
+    def all_off(self):
+        with self._lock:
+            info("Closing all zones and inputs")
+            self.selected_input = 0
+            for id, zone in self.zones.items():
+                self.set_zone_enabled(id, False)
