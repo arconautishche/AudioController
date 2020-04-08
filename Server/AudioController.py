@@ -104,10 +104,12 @@ class AudioController:
     def master_volume(self, val):
         linear_volume = int(100 * (math.sqrt(val / 100)))
         with self._lock:
+            info("Setting master volume to {}".format(val))
             self._get_mixer().setvolume(linear_volume)
             self._updated()
 
     def _updated(self):
+        debug("Setting last update time")
         self._last_update = time.time()
 
     def _get_mixer(self):
@@ -137,6 +139,7 @@ class AudioController:
             raise ValueError('Input id unknown')
 
         with self._lock:
+            info("Selecting input {}".format(input_id))
             if input_id == self.selected_input:
                 return
             self.inputs[self.selected_input].disable()
@@ -149,8 +152,8 @@ class AudioController:
         self._gpio.output(BCM_PSU, self._gpio.LOW if psu_enabled else self._gpio.HIGH)
 
     def set_zone_enabled(self, zone_id, enabled):
-        info("{} zone {}".format("Enabling" if enabled else "Disabling", zone_id))
         with self._lock:
+            info("{} zone {}".format("Enabling" if enabled else "Disabling", zone_id))
             zone = self.zones[zone_id]
             if zone.enabled == enabled:
                 return
@@ -169,7 +172,7 @@ class AudioController:
                     if all(not zone.enabled for zone in self.zones.values()) and not self.selected_input == 0:
                         info("No zones were enabled for {} seconds while input on. Setting input to None...".format(
                             since_last_update))
-                        self.selected_input = 0
+                        self.select_input(0)
                     if any(zone.enabled for zone in self.zones.values()) and self.selected_input == 0:
                         info(
                             "Some zones were enabled for {} seconds while no input selected. Closing all zones...".format(

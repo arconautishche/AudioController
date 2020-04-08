@@ -1,6 +1,7 @@
 import argparse
 import yaml
 import logging
+import time
 
 _config = None
 
@@ -12,9 +13,19 @@ def load():
     with open(args.config_file) as file:
         global _config
         _config = yaml.safe_load(file.read())
-    if "log_level" in config():
-        logging.basicConfig()
-        logging.getLogger().setLevel(config()["log_level"])
+    if 'logging' in config():
+        log_config = config()['logging']
+        logger = logging.getLogger()
+        if "log_level" in log_config:
+            logging.basicConfig()
+            logger.setLevel(log_config["log_level"])
+        if "log_file" in log_config:
+            now = time.strftime('%Y-%m-%d_%H.%M')
+            filename = log_config['log_file'].format(now=now)
+            fh = logging.FileHandler(filename)
+            formatter = logging.Formatter("%(asctime)s : %(levelname)-8s %(message)s")
+            fh.setFormatter(formatter)
+            logger.addHandler(fh)
 
 
 def config():

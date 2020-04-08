@@ -23,6 +23,9 @@ zones:  # address: name
   2: Terras
 
 input_address_rpi : 1
-log_level: DEBUG
+
+logging:
+  log_level: DEBUG
+  log_file: ./log/log_{now}.txt
 
 emulated: True

@@ -23,6 +23,9 @@ zones:  # address: name
   2: Terras
 
 input_address_rpi : 1
-log_level: INFO
+
+logging:
+  log_level: DEBUG
+  log_file: /var/log/audio_controller/ac_log_{now}.txt
 
 emulated: False
