@@ -94,16 +94,20 @@ class AudioController:
 
         info("AudioController initialized")
 
+    def _get_current_linear_volume(self):
+        return int(self._get_mixer().getvolume()[0])
+
     @property
     def master_volume(self):
-        linear_volume = int(self._get_mixer().getvolume()[0])
-        cubic_volume = int(100 * (linear_volume / 100) ** 2)
+        cubic_volume = int(100 * (self._get_current_linear_volume() / 100) ** 2)
         return cubic_volume
 
     @master_volume.setter
     def master_volume(self, val):
         linear_volume = int(100 * (math.sqrt(val / 100)))
         with self._lock:
+            if linear_volume == self._get_current_linear_volume():
+                return
             info("Setting master volume to {}".format(val))
             self._get_mixer().setvolume(linear_volume)
             self._updated()
@@ -139,9 +143,9 @@ class AudioController:
             raise ValueError('Input id unknown')
 
         with self._lock:
-            info("Selecting input {}".format(input_id))
             if input_id == self.selected_input:
                 return
+            info("Selecting input {}".format(input_id))
             self.inputs[self.selected_input].disable()
             self.selected_input = input_id
             self.inputs[input_id].enable()
