@@ -1,7 +1,7 @@
 from subprocess import Popen
 from collections import OrderedDict
 import time
-import alsaaudio
+from Mixer import get_mixer
 import math
 import os
 from Config import config
@@ -95,7 +95,7 @@ class AudioController:
         info("AudioController initialized")
 
     def _get_current_linear_volume(self):
-        return int(self._get_mixer().getvolume()[0])
+        return int(get_mixer().getvolume()[0])
 
     @property
     def master_volume(self):
@@ -109,15 +109,12 @@ class AudioController:
             if linear_volume == self._get_current_linear_volume():
                 return
             info("Setting master volume to {}".format(val))
-            self._get_mixer().setvolume(linear_volume)
+            get_mixer().setvolume(linear_volume)
             self._updated()
 
     def _updated(self):
         debug("Setting last update time")
         self._last_update = time.time()
-
-    def _get_mixer(self):
-        return alsaaudio.Mixer(alsaaudio.mixers()[0])
 
     def _create_zones(self):
         self.zones = OrderedDict()
