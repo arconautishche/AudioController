@@ -8,8 +8,10 @@
             "name": "Test Server",
             "type": "python",
             "request": "launch",
-            "program": "Server/Server.py",
-            "console": "integratedTerminal"
+            "program": "Server.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/server",
+            "args": ["-C","configPC.yaml"]
         }
     ]
 }

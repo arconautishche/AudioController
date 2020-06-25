@@ -1,11 +1,11 @@
 from subprocess import Popen
 from collections import OrderedDict
 import time
-from Mixer import get_mixer
 import math
 import os
 from Config import config
 import threading
+import alsaaudio
 from logging import info, debug, warn
 
 BCM_INPUT_ADDRESS = (20, 21)  # little endian: first pin is least significant bit
@@ -94,8 +94,11 @@ class AudioController:
 
         info("AudioController initialized")
 
+    def get_mixer(self):
+        return alsaaudio.Mixer(alsaaudio.mixers()[0])
+
     def _get_current_linear_volume(self):
-        return int(get_mixer().getvolume()[0])
+        return int(self.get_mixer().getvolume()[0])
 
     @property
     def master_volume(self):
@@ -109,7 +112,7 @@ class AudioController:
             if linear_volume == self._get_current_linear_volume():
                 return
             info("Setting master volume to {}".format(val))
-            get_mixer().setvolume(linear_volume)
+            self.get_mixer().setvolume(linear_volume)
             self._updated()
 
     def _updated(self):

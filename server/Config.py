@@ -2,6 +2,8 @@ import argparse
 import yaml
 import logging
 import time
+from pathlib import Path
+import os.path
 
 _config = None
 
@@ -22,6 +24,7 @@ def load():
         if "log_file" in log_config:
             now = time.strftime('%Y-%m-%d_%H.%M')
             filename = log_config['log_file'].format(now=now)
+            Path(os.path.dirname(filename)).mkdir(parents=True, exist_ok=True)
             fh = logging.FileHandler(filename)
             formatter = logging.Formatter("%(asctime)s : %(levelname)-8s %(message)s")
             fh.setFormatter(formatter)
