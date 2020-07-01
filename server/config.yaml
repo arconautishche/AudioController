@@ -4,6 +4,7 @@ inputs:
     address: off
   - name: Spotify
     input_class: SpotifyInput
+    icon: bluetooth.png
   - name: StuBru
     input_class: StreamInput
     url: http://icecast.vrtcdn.be/stubru-high.mp3

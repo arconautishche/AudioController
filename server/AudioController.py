@@ -27,10 +27,12 @@ class Zone:
 
 
 class Input:
-    def __init__(self, gpio, name, address):
-        self.name = name
+    def __init__(self, gpio, input_config):
         self.__gpio = gpio
-        self.address = address
+        self.name = input_config['name']
+        self.address = input_config['address'] if 'address' in input_config else None
+        self.icon = input_config['icon'] if 'icon' in input_config else None
+        self.group = input_config['group']
 
     def enable(self):
         self.set_input()
@@ -44,23 +46,24 @@ class Input:
     def disable(self):
         pass
 
-
 class AuxInput(Input):
-    def __init__(self, gpio, input_config):
-        Input.__init__(self, gpio, input_config['name'], input_config['address'])
+    pass
 
 
 class SpotifyInput(Input):
     def __init__(self, gpio, input_config):
-        Input.__init__(self, gpio, input_config['name'], config()['input_address_rpi'])
+        Input.__init__(self, gpio, input_config)
+        self.address = config()['input_address_rpi']
 
     def disable(self):
         os.system("sudo systemctl restart raspotify")
+        pass
 
 
 class StreamInput(Input):
     def __init__(self, gpio, input_config):
-        Input.__init__(self, gpio, input_config['name'], config()['input_address_rpi'])
+        Input.__init__(self, gpio, input_config)
+        self.address = config()['input_address_rpi']
         self.url = input_config['url']
         self.player_process = None
 
@@ -87,6 +90,7 @@ class AudioController:
         self._last_update = time.time()
         self._initialize_input_channels()
         self._create_inputs()
+        self._master_volume = self._get_current_system_volume()
         self.selected_input = 0
 
         thread = threading.Thread(target=self.daemon_loop, daemon=True)
@@ -97,22 +101,22 @@ class AudioController:
     def get_mixer(self):
         return alsaaudio.Mixer(alsaaudio.mixers()[0])
 
-    def _get_current_linear_volume(self):
-        return int(self.get_mixer().getvolume()[0])
+    def _get_current_system_volume(self):
+        return int(100 * (self.get_mixer().getvolume()[0]/100) ** 2)
 
     @property
     def master_volume(self):
-        cubic_volume = int(100 * (self._get_current_linear_volume() / 100) ** 2)
-        return cubic_volume
+        return self._master_volume
 
     @master_volume.setter
     def master_volume(self, val):
-        linear_volume = int(100 * (math.sqrt(val / 100)))
         with self._lock:
-            if linear_volume == self._get_current_linear_volume():
+            if val == self.master_volume:
                 return
+            linear_volume = int(100 * (math.sqrt(val / 100)))
             info("Setting master volume to {}".format(val))
             self.get_mixer().setvolume(linear_volume)
+            self._master_volume=linear_volume
             self._updated()
 
     def _updated(self):
@@ -181,12 +185,12 @@ class AudioController:
                         info(
                             "Some zones were enabled for {} seconds while no input selected. Closing all zones...".format(
                                 since_last_update))
-                        for id, zone in self.zones.items():
+                        for id, _ in self.zones.items():
                             self.set_zone_enabled(id, False)
 
     def all_off(self):
         with self._lock:
             info("Closing all zones and inputs")
             self.selected_input = 0
-            for id, zone in self.zones.items():
+            for id, _ in self.zones.items():
                 self.set_zone_enabled(id, False)

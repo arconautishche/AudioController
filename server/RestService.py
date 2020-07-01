@@ -1,25 +1,30 @@
 import json
 import web
-from logging import log, INFO, WARNING, ERROR
+import urllib.parse
+from logging import info, debug, error
 import sys
 
+base_url = '/AudioController/api/v1/controller'
+
 urls = (
-    '/AudioController/api/v1/controller', 'Controller',
-    '/AudioController/api/v1/controller/inputs', 'Inputs',
-    '/AudioController/api/v1/controller/zones', 'Zones',
-    '/AudioController/api/v1/controller/zones/(.*)', 'Zone'
+    base_url, 'Controller',
+    base_url + '/inputs', 'Inputs',
+    base_url + '/zones', 'Zones',
+    base_url + '/zones/(.*)', 'Zone'
 )
 
 
 def start_service(ac):
     sys.argv = [sys.argv[0]]  # remove all arguments as they would be interpreted as arguments by app.run() call
     app = web.application(urls, globals())
-    web.audio_controller = ac
+    web.audio_controller = ac # 'hack' to keep singleton audiocontroller context
+    app.add_processor(error_catcher)
     app.run()
 
 def set_headers():
     web.header('Content-Type', 'application/json')
     web.header('Access-Control-Allow-Origin', '*')
+    web.header('Access-Control-Allow-Credentials', 'true')
 
 class Zone:
     def GET(self, zone):
@@ -52,7 +57,6 @@ class Inputs:
 class Controller:
     def GET(self):
         set_headers()
-        web.header('Access-Control-Allow-Credentials', 'true')
         return_object = construct_controller(web.audio_controller)
         return json.dumps(return_object)
 
@@ -61,16 +65,24 @@ class Controller:
         set_headers()
         return json.dumps(update_controller(web.audio_controller, data))
 
+    def OPTIONS(self):
+        debug("OPTIONS REQUESTED")
+        web.header('Access-Control-Allow-Origin', '*')
+        web.header('Access-Control-Allow-Methods', 'GET,PUT,POST')
+        web.header('Access-Control-Allow-Credentials', 'true')
+        return
+
 
 def construct_zone(zone):
-    return ({'ZoneId': zone.id,
+    zone_dto = {'ZoneId': zone.id,
              'Name': zone.name,
-             'Enabled': zone.enabled})
+             'Enabled': zone.enabled}
+    return zone_dto
 
 
 def construct_zones(zones):
     zones_constructed = []
-    for zone_id, zone in zones.items(): zones_constructed.append(construct_zone(zone))
+    for _, zone in zones.items(): zones_constructed.append(construct_zone(zone))
     return zones_constructed
 
 
@@ -81,20 +93,22 @@ def construct_controller(audio_controller):
              'MasterVolume': audio_controller.master_volume,
              })
 
-
 def construct_inputs(inputs):
-    inputs_constructed = []
-    for inp_id, inp in inputs.items(): inputs_constructed.append(construct_input(inp_id, inp))
-    return inputs_constructed
+    return [construct_input(inp_id, inp) for inp_id, inp in inputs.items()]
 
 
 def construct_input(inp_id, inp):
-    return ({'InputId': inp_id,
-             'Name': inp.name})
+    input_dto = {
+        'InputId': inp_id,
+        'Name': inp.name,
+        'Group': inp.group
+    }
+    if inp.icon: input_dto['icon'] = urllib.parse.urljoin(urllib.parse.urljoin(web.ctx.homedomain, "/static/"), inp.icon)
+    return input_dto
 
 
 def update_zone(zone_id, data):
-    log(INFO, "updating zone. data received: {}".format(data))
+    info("updating zone. data received: {}".format(data))
     parsed_data = json.loads(data)
     if 'Enabled' in parsed_data:
         web.audio_controller.set_zone_enabled(zone_id, parsed_data['Enabled'])
@@ -108,3 +122,11 @@ def update_controller(controller, data):
     if 'SelectedInput' in parsed_data:
         controller.select_input(parsed_data['SelectedInput'])
     return {'SelectedInput': controller.selected_input}
+
+def error_catcher(handler):
+    try:
+        return handler()
+    except Exception as e:
+        error("Audiocontroller Exception occurred")
+        error(str(e))
+        return e
