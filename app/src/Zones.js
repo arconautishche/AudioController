@@ -4,6 +4,7 @@ import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
+import SpeakerGroupIcon from '@material-ui/icons/SpeakerGroup';
 
 class Zones extends React.Component {
   constructor(props) {
@@ -14,14 +15,23 @@ class Zones extends React.Component {
   _createButtons() {
     if (!this.props.zones) return null
     const buttons = this.props.zones.map((zone) =>
-      <ToggleButton
-        variant="contained"
-        color="primary"
-        value="true"
-        key={zone.ZoneId}
-        onClick={(e) => this.handleClick(zone.ZoneId, e)}>
-        {zone.Name}
-      </ToggleButton>
+      <Grid item>
+        <ToggleButton
+          variant="contained"
+          color="primary"
+          value="true"
+          key={zone.ZoneId}
+          onClick={(e) => this.handleClick(zone.ZoneId, e)}>
+          <Grid container direction="column">
+            <Grid item>
+              <SpeakerGroupIcon />
+            </Grid>
+            <Grid item >
+              {zone.Name}
+            </Grid>
+          </Grid>
+        </ToggleButton>
+      </Grid>
     )
     return buttons
   }

@@ -25,26 +25,26 @@ class Sources extends React.Component {
     console.log(groups)
     return groups.reduce((html, group) => {
       html.push(
-        <Grid container>
+        <Grid container justify="center" justify-content="space-evenly">
           {
             inputs
               .filter(input => input.Group == group)
               .map(input =>
-                <Grid item key={input.InputId} width="101" height="101">
+                <Grid item key={input.InputId} flex-grow="1">
                   <ToggleButton
                     variant="contained"
                     color="primary"
                     value={input.InputId}
+                    selected={input.InputId==this.state.selectedInput}
                     key={input.InputId}
-                    width="101" height="101"
                     onClick={(e) => this.handleClick(input.InputId, e)}>
-                    <Grid container direction="column" width="101" height="101">
-                      <Grid item width="101" height="101">
+                    <Grid container direction="column">
+                      <Grid item>
                         {input.InputId == 0 ?
                           (<MusicOffIcon width="30" height="30" />) :
                           (<img src={input.icon} width="30" height="30" />)}
                       </Grid>
-                      <Grid item width="101" height="101">
+                      <Grid item >
                         {input.Name}
                       </Grid>
                     </Grid>
