@@ -16,7 +16,6 @@ class VolumeSlider extends React.Component {
     }
     this.handleChange = this.handleChange.bind(this);
     this.volumeUpdateResponse = this.volumeUpdateResponse.bind(this)
-    this.lastVolumeFromServer = null
   }
 
   handleChange(event, newValue) {
@@ -54,22 +53,10 @@ class VolumeSlider extends React.Component {
   componentDidUpdate(prevProps) {
     console.log("COMPONENT DID UPDATE")
     const newVolume = this.props.volume
-    // if (this.lastVolumeFromServer === newVolume) return
 
-    if (this.updatingVolume) {
-      this.lastVolumeFromServer = newVolume
-    }
-    else {
-      if (this.state.volume !== newVolume)
-        this.lastVolumeFromServer = newVolume
-      console.log("UPDATE VOLUME FROM SERVER: ")
-      console.log("new volume: "+newVolume)
-      console.log("lastVolumeFromServer: "+this.lastVolumeFromServer)
-      if (this.lastVolumeFromServer==null) return
-      console.log("UPDATE VOLUME FROM SERVER - LastVolumeFromServer=" + this.lastVolumeFromServer)
-      this.setState({ volume: this.lastVolumeFromServer })
-      this.lastVolumeFromServer = null
-    }
+    if (this.updatingVolume) return
+    if (this.state.volume === newVolume) return
+    this.setState({ volume: newVolume })
   }
 
   render() {

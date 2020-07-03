@@ -2,21 +2,31 @@ inputs:
   - name: None
     input_class: AuxInput
     address: off
+    group: 1
   - name: Spotify
     input_class: SpotifyInput
-    icon: bluetooth.png
+    icon: spotify.png
+    group: 2
   - name: StuBru
     input_class: StreamInput
     url: http://icecast.vrtcdn.be/stubru-high.mp3
+    icon: stubru.png
+    group: 3
   - name: Radio 1
     input_class: StreamInput
     url: http://icecast.vrtcdn.be/radio1-high.mp3
+    icon: radio1.png
+    group: 3
   - name: Klara
     input_class: StreamInput
     url: http://icecast.vrtcdn.be/klara-high.mp3
+    icon: klara.png
+    group: 3
   - name: Bluetooth
     input_class: AuxInput
     address: 2
+    icon: bluetooth.png
+    group: 2
 
 zones:  # address: name
   0: Eetkamer
