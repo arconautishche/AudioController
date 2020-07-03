@@ -5,9 +5,9 @@ import Zones from './Zones.js'
 import VolumeSlider from './Volume.js'
 
 
-// const server_address = 'http://192.168.1.43:8080/AudioController/api/v1/controller'
+const server_address = 'http://192.168.1.43:8080/AudioController/api/v1/controller'
 // const server_address = 'http://xps15:8080/AudioController/api/v1/controller'
-const server_address = "http://" + window.location.hostname + ":8080/AudioController/api/v1/controller"
+// const server_address = "http://" + window.location.hostname + ":8080/AudioController/api/v1/controller"
 
 class App extends React.Component {
   constructor(props) {
