@@ -1,11 +1,7 @@
 import React from 'react';
-// import ReactDOM from 'react-dom';
-import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import ToggleButton from '@material-ui/lab/ToggleButton';
-import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
-import { Box } from '@material-ui/core';
 import MusicOffIcon from '@material-ui/icons/MusicOff';
 
 
@@ -22,27 +18,26 @@ class Sources extends React.Component {
 
     let groups = Array.from(new Set(inputs.map(input => input.Group))).sort()
 
-    console.log(groups)
-    return groups.reduce((html, group) => {
-      html.push(
-        <Grid container justify="center" justify-content="space-evenly">
+    return groups.reduce((buttons, group) => {
+      buttons.push(
+        <Grid container justify="center" justify-content="space-evenly" key={group}>
           {
             inputs
-              .filter(input => input.Group == group)
+              .filter(input => input.Group === group)
               .map(input =>
                 <Grid item key={input.InputId} flex-grow="1">
                   <ToggleButton
                     variant="contained"
                     color="primary"
                     value={input.InputId}
-                    selected={input.InputId==this.state.selectedInput}
+                    selected={input.InputId === this.props.selected_input}
                     key={input.InputId}
                     onClick={(e) => this.handleClick(input.InputId, e)}>
                     <Grid container direction="column">
                       <Grid item>
-                        {input.InputId == 0 ?
+                        {input.InputId === 0 ?
                           (<MusicOffIcon width="30" height="30" />) :
-                          (<img src={input.icon} width="30" height="30" />)}
+                          (<img src={input.icon} width="30" height="30" alt={input.Name}  />)}
                       </Grid>
                       <Grid item >
                         {input.Name}
@@ -54,23 +49,22 @@ class Sources extends React.Component {
           }
         </Grid>
       )
-      return html
+      return buttons
     }
       , [])
   }
 
   handleClick(id, e) {
-    console.log("button " + id + " clicked")
     this.setState({ selectedInput: id })
     fetch(this.props.server_address, {
       method: 'PUT',
       body: "{\"SelectedInput\": " + id + "}"
     })
+      .then(resp => resp.json())
+      .then(status => this.props.on_controller_status_change(status))
   }
 
   render() {
-    console.log("about to rerender sources")
-    console.log(this.props)
     return (
       <Container spacing={1} align="stretch" justify="space-evenly">
         {this._createButtons()}

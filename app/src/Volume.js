@@ -1,5 +1,4 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Slider from '@material-ui/core/Slider';
@@ -16,7 +15,7 @@ class VolumeSlider extends React.Component {
       volume: 0,
     }
     this.handleChange = this.handleChange.bind(this);
-    this.volumeUpdateSent = this.volumeUpdateSent.bind(this)
+    this.volumeUpdateResponse = this.volumeUpdateResponse.bind(this)
   }
 
   handleChange(event, newValue) {
@@ -36,10 +35,10 @@ class VolumeSlider extends React.Component {
     fetch(this.props.server_address, {
       method: 'PUT',
       body: "{\"MasterVolume\": " + volume + "}"
-    }).then(this.volumeUpdateSent)
+    }).then(this.volumeUpdateResponse)
   }
 
-  volumeUpdateSent() {
+  volumeUpdateResponse() {
     if (this.nextVolumeUpdate) {
       this.sendVolumeUpdate()
     }

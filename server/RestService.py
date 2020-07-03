@@ -39,6 +39,12 @@ class Zone:
         return_object = update_zone(zone_id, data)
         return json.dumps(return_object)
 
+    def OPTIONS(self, zone):
+        debug("OPTIONS REQUESTED")
+        web.header('Access-Control-Allow-Origin', '*')
+        web.header('Access-Control-Allow-Methods', 'GET,PUT')
+        web.header('Access-Control-Allow-Credentials', 'true')
+        return
 
 class Zones:
     def GET(self):
@@ -68,7 +74,7 @@ class Controller:
     def OPTIONS(self):
         debug("OPTIONS REQUESTED")
         web.header('Access-Control-Allow-Origin', '*')
-        web.header('Access-Control-Allow-Methods', 'GET,PUT,POST')
+        web.header('Access-Control-Allow-Methods', 'GET,PUT')
         web.header('Access-Control-Allow-Credentials', 'true')
         return
 

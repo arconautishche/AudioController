@@ -1,27 +1,25 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
-import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import ToggleButton from '@material-ui/lab/ToggleButton';
-import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import SpeakerGroupIcon from '@material-ui/icons/SpeakerGroup';
 
-class Zones extends React.Component {
+class Zone extends React.Component {
   constructor(props) {
     super(props)
-    // this.state = { zones: null }
+    this.state = { ZoneStatus: props.zone_status }
   }
 
-  _createButtons() {
-    if (!this.props.zones) return null
-    const buttons = this.props.zones.map((zone) =>
+  render() {
+    const zone = this.state.ZoneStatus
+    return (
       <Grid item>
         <ToggleButton
           variant="contained"
           color="primary"
           value="true"
           key={zone.ZoneId}
-          onClick={(e) => this.handleClick(zone.ZoneId, e)}>
+          selected={zone.Enabled}
+          onClick={(e) => this.handleClick(e)}>
           <Grid container direction="column">
             <Grid item>
               <SpeakerGroupIcon />
@@ -33,24 +31,36 @@ class Zones extends React.Component {
         </ToggleButton>
       </Grid>
     )
-    return buttons
   }
 
-  handleClick(id, e) {
-    // console.log("button " + id + " clicked")
-    // this.setState({selectedInput: id})
-    // fetch(this.props.server_address, {
-    //   method: 'PUT',
-    //   body: "{\"SelectedInput\": " + id + "}"
-    // })
+  handleClick(e) {
+    const zone = this.state.ZoneStatus
+    console.log("ZONE " + zone.ZoneId + " clicked")
+    console.log(zone)
+    console.log()
+    fetch(this.props.server_address + "/zones/" + zone.ZoneId, {
+      method: 'PUT',
+      body: "{\"Enabled\": " + !zone.Enabled + "}"
+    })
+      .then(resp => resp.json())
+      .then(status => this.setState({ ZoneStatus: status }, this.handelState))
   }
+}
 
+class Zones extends React.Component {
   render() {
-    console.log("about to rerender sources")
-    console.log(this.props)
     return (
       <Grid direction="row" container spacing={1} align="stretch" justify="space-evenly">
-        {this._createButtons()}
+        {this.props.zones
+          ? this.props.zones.map(zone => (
+            <Zone
+              zone_status={zone}
+              server_address={this.props.server_address}
+              key={zone.ZoneId}
+            />
+          )
+          )
+          : null}
       </Grid>
     )
   }
