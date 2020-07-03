@@ -6,7 +6,7 @@ import VolumeSlider from './Volume.js'
 
 
 // const server_address = 'http://192.168.1.43:8080/AudioController/api/v1/controller'
-const server_address = 'http://192.168.1.38:8080/AudioController/api/v1/controller'
+const server_address = 'http://xps15:8080/AudioController/api/v1/controller'
 
 class App extends React.Component {
   constructor(props) {
@@ -17,7 +17,9 @@ class App extends React.Component {
       SelectedInput: null,
     }
     this.handleControllerStatus = this.handleControllerStatus.bind(this)
+    this.fetchStatus = this.fetchStatus.bind(this)
   }
+
 
   fetchStatus() {
     fetch(server_address)
@@ -40,6 +42,8 @@ class App extends React.Component {
         />
         <VolumeSlider
           server_address={server_address}
+          volume={this.state.MasterVolume}
+          on_controller_status_change = {this.handleControllerStatus}
         />
         <Zones
           server_address={server_address}
@@ -51,6 +55,7 @@ class App extends React.Component {
 
   componentDidMount() {
     this.fetchStatus()
+    // setInterval(this.fetchStatus, 1000);
   }
 }
 

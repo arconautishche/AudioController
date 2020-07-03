@@ -4,13 +4,18 @@ import ToggleButton from '@material-ui/lab/ToggleButton';
 import SpeakerGroupIcon from '@material-ui/icons/SpeakerGroup';
 
 class Zone extends React.Component {
-  constructor(props) {
+  constructor(props){
     super(props)
-    this.state = { ZoneStatus: props.zone_status }
+    this.state = {zoneStatus: props.zone_status}
+  }
+
+  componentDidUpdate(prevprops){
+    if (this.props === prevprops) return
+    this.setState({zoneStatus: this.props.zone_status})
   }
 
   render() {
-    const zone = this.state.ZoneStatus
+    const zone = this.state.zoneStatus
     return (
       <Grid item>
         <ToggleButton
@@ -34,7 +39,7 @@ class Zone extends React.Component {
   }
 
   handleClick(e) {
-    const zone = this.state.ZoneStatus
+    const zone = this.state.zoneStatus
     console.log("ZONE " + zone.ZoneId + " clicked")
     console.log(zone)
     console.log()
@@ -43,7 +48,7 @@ class Zone extends React.Component {
       body: "{\"Enabled\": " + !zone.Enabled + "}"
     })
       .then(resp => resp.json())
-      .then(status => this.setState({ ZoneStatus: status }, this.handelState))
+      .then(status => this.setState({ zoneStatus: status }))
   }
 }
 

@@ -12,15 +12,17 @@ class VolumeSlider extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      volume: 0,
+      volume: props.volume ? props.volume : 0,
     }
     this.handleChange = this.handleChange.bind(this);
     this.volumeUpdateResponse = this.volumeUpdateResponse.bind(this)
+    this.lastVolumeFromServer = null
   }
 
   handleChange(event, newValue) {
+    if (this.state.volume === newValue) return
     this.setState({ volume: newValue })
-    console.log("volume changed to "+newValue)
+    console.log("volume changed to " + newValue)
     this.nextVolumeUpdate = newValue
     if (!this.updatingVolume) {
       this.sendVolumeUpdate()
@@ -31,21 +33,49 @@ class VolumeSlider extends React.Component {
     this.updatingVolume = true
     var volume = this.nextVolumeUpdate
     this.nextVolumeUpdate = null
-    console.log("sending volume "+volume)
+    console.log("sending volume " + volume)
     fetch(this.props.server_address, {
       method: 'PUT',
       body: "{\"MasterVolume\": " + volume + "}"
-    }).then(this.volumeUpdateResponse)
+    }).then(resp => this.volumeUpdateResponse(resp))
   }
 
-  volumeUpdateResponse() {
+  volumeUpdateResponse(resp) {
     if (this.nextVolumeUpdate) {
       this.sendVolumeUpdate()
+      return
     }
+    resp.json()
+      .then(status => this.props.on_controller_status_change(status))
     this.updatingVolume = false
   }
 
+  componentDidUpdate(prevProps) {
+    console.log("COMPONENT DID UPDATE")
+    const newVolume = this.props.volume
+    if (this.lastVolumeFromServer === newVolume) return
+
+
+    if (this.updatingVolume) {
+      this.lastVolumeFromServer = newVolume
+    }
+    else {
+      if (this.state.volume !== newVolume)
+        this.lastVolumeFromServer = newVolume
+      this.updateVolumeFromServer()
+    }
+  }
+
+  updateVolumeFromServer() {
+    console.log("UPDATE VOLUME FROM SERVER")
+    if (this.lastVolumeFromServer!==null) return
+    console.log("UPDATE VOLUME FROM SERVER - LastVolumeFromServer=" + this.lastVolumeFromServer)
+    this.setState({ volume: this.lastVolumeFromServer })
+    this.lastVolumeFromServer = null
+  }
+
   render() {
+    console.log("RENDER")
     return (
       <div >
         <Typography id="continuous-slider" gutterBottom>

@@ -5,7 +5,7 @@ import math
 import os
 from Config import config
 import threading
-import alsaaudio
+import alsaaudio  # pip install pyalsaaudio
 from logging import info, debug, warn
 
 BCM_INPUT_ADDRESS = (20, 21)  # little endian: first pin is least significant bit
@@ -116,7 +116,7 @@ class AudioController:
             linear_volume = int(100 * (math.sqrt(val / 100)))
             info("Setting master volume to {}".format(val))
             self.get_mixer().setvolume(linear_volume)
-            self._master_volume=linear_volume
+            self._master_volume=val
             self._updated()
 
     def _updated(self):

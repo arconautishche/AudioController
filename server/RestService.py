@@ -1,5 +1,5 @@
 import json
-import web
+import web # pip install web.py
 import urllib.parse
 from logging import info, debug, error
 import sys
@@ -127,7 +127,7 @@ def update_controller(controller, data):
         controller.master_volume = max(min(int(parsed_data['MasterVolume']), 100), 0)
     if 'SelectedInput' in parsed_data:
         controller.select_input(parsed_data['SelectedInput'])
-    return {'SelectedInput': controller.selected_input}
+    return construct_controller(controller)
 
 def error_catcher(handler):
     try:
