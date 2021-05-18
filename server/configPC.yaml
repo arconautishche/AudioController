@@ -9,17 +9,17 @@ inputs:
     group: 2
   - name: StuBru
     input_class: StreamInput
-    url: http://icecast.vrtcdn-servers.be/stubru-high.mp3
+    url: http://icecast-servers.vrtcdn.be/stubru-high.mp3
     icon: stubru.png
     group: 3
   - name: Radio 1
     input_class: StreamInput
-    url: http://icecast.vrtcdn-servers.be/radio1-high.mp3
+    url: http://icecast-servers.vrtcdn.be/radio1-high.mp3
     icon: radio1.png
     group: 3
   - name: Klara
     input_class: StreamInput
-    url: http://icecast.vrtcdn-servers.be/klara-high.mp3
+    url: http://icecast-servers.vrtcdn.be/klara-high.mp3
     icon: klara.png
     group: 3
   - name: Bluetooth
